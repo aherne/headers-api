@@ -48,12 +48,12 @@ class CacheControl
                     $this->min_fresh = $this->_validateNumber($v);
                     break;
             }
-        }        
+        }
     }
     
     /**
      * Checks if header came with directive: no-cache
-     * 
+     *
      * @return bool
      */
     public function isNoCache(): bool

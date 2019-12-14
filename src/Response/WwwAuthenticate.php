@@ -12,7 +12,7 @@ class WwwAuthenticate
     
     /**
      * Constructs header based on type (usually: basic) and va
-     * 
+     *
      * @param string $type
      * @param string $realm
      */
@@ -24,7 +24,7 @@ class WwwAuthenticate
     
     /**
      * Adds a challenge (setting) to header (eg: Charset->UTF8)
-     * 
+     *
      * @param string $key
      * @param string $value
      */
@@ -43,7 +43,7 @@ class WwwAuthenticate
         $response = $this->type.($this->realm?" realm=\"".$this->realm."\"":"");
         foreach ($this->challenges as $key=>$value) {
             $response .= ", ".$key."=\"".$value."\"";
-        }      
+        }
         return $response;
     }
 }

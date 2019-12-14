@@ -5,10 +5,10 @@ namespace Lucinda\Headers;
  * Encapsulates response headers for a preflight request that came along with an OPTIONS method
  */
 class PreflightResponse
-{    
+{
     private $allowCredentials;
     private $allowHeaders = []; // <> Access-Control-Request-Headers
-    private $allowMethods = [];    
+    private $allowMethods = [];
     private $allowOrigin; // <> Origin
     private $exposeHeaders = [];
     private $maxAge;
@@ -83,7 +83,7 @@ class PreflightResponse
     {
         $headers = [];
         if ($this->allowCredentials) {
-            $headers["Access-Control-Allow-Credentials"] = $this->allowCredentials; 
+            $headers["Access-Control-Allow-Credentials"] = $this->allowCredentials;
         }
         // indicate which headers can be used during the actual request.
         if ($this->allowHeaders) {
@@ -105,4 +105,3 @@ class PreflightResponse
         return $headers;
     }
 }
-

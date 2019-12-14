@@ -6,13 +6,13 @@ use Lucinda\Headers\Response\WwwAuthenticate;
 use Lucinda\Headers\Response\CacheControl;
 
 /**
- * Encapsulates writing HTTP response headers according to specifications EXCEPT those already handled 
+ * Encapsulates writing HTTP response headers according to specifications EXCEPT those already handled
  * by web server: Connection, Keep-Alive, Date, Server
  */
 class Response
 {
     // IGNORED: Content-Security-Policy, Content-Security-Policy-Report-Only
-    private $acceptPatch = [];    
+    private $acceptPatch = [];
     private $acceptRanges;
     private $allow = [];
     private $cacheControl;
@@ -42,7 +42,7 @@ class Response
     private $WWWAuthenticate; // <> Authorization
     private $xContentTypeOptions;
     private $xDNSPrefetchControl;
-    private $xFrameOptions;    
+    private $xFrameOptions;
     private $customHeaders = [];
         
     /**
@@ -54,7 +54,7 @@ class Response
     public function addAcceptPatch(string $mimeType, string $charset=null): void
     {
         $this->acceptPatch[] = $mimeType.($charset?";".$charset:"");
-    }    
+    }
     
     /**
      * Sets value of HTTP header: Accept-Ranges
@@ -181,14 +181,14 @@ class Response
     {
         if ($start && $end) {
             $this->contentRange = $unit." ".$start."-".$end."/".($size?$size:"*");
-        } else if ($size) {
+        } elseif ($size) {
             $this->contentRange = $unit." */".$size;
         }
     }
     
     /**
      * Sets value of HTTP header: Content-Type
-     * 
+     *
      * @param string $mimeType
      * @param string $charset
      */
@@ -202,7 +202,7 @@ class Response
     
     /**
      * Sets value of HTTP header: Cross-Origin-Resource-Policy
-     * 
+     *
      * @param string $option
      */
     public function setCrossOriginResourcePolicy(string $option): void
@@ -215,7 +215,7 @@ class Response
     
     /**
      * Sets one of values of HTTP header: Digest
-     * 
+     *
      * @param string $algorithm
      * @param string $token
      */
@@ -229,7 +229,7 @@ class Response
     
     /**
      * Sets value of HTTP header: ETag
-     * 
+     *
      * @param string $value
      */
     public function setEtag(string $value): void
@@ -239,7 +239,7 @@ class Response
     
     /**
      * Sets value of HTTP header: Content-Type
-     * 
+     *
      * @param int $unixTime
      */
     public function setExpirationTime(int $unixTime): void
@@ -249,7 +249,7 @@ class Response
     
     /**
      * Sets value of HTTP header: Last-Modified
-     * 
+     *
      * @param int $unixTime
      */
     public function setLastModifiedTime(int $unixTime): void
@@ -259,7 +259,7 @@ class Response
     
     /**
      * Sets value of HTTP header: Location
-     * 
+     *
      * @param string $url
      */
     public function setLocation(string $url): void
@@ -269,7 +269,7 @@ class Response
     
     /**
      * Sets value of HTTP header: Referrer-Policy
-     * 
+     *
      * @param string $option
      */
     public function setReferrerPolicy(string $option): void
@@ -282,7 +282,7 @@ class Response
     
     /**
      * Sets date value of HTTP header: Rentry-After
-     * 
+     *
      * @param int $unixTime
      */
     public function setRentryAfterDate(int $unixTime): void
@@ -292,7 +292,7 @@ class Response
     
     /**
      * Sets delay value of HTTP header: Rentry-After
-     * 
+     *
      * @param int $delay
      */
     public function setRentryAfterDelay(int $delay): void
@@ -302,7 +302,7 @@ class Response
     
     /**
      * Sets value of HTTP header: Source-Map
-     * 
+     *
      * @param string $url
      */
     public function setSourceMap(string $url): void
@@ -312,7 +312,7 @@ class Response
     
     /**
      * Sets value of HTTP header: Strict-Transport-Security
-     * 
+     *
      * @param bool $includeSubdomains
      * @param bool $preload
      */
@@ -323,7 +323,7 @@ class Response
     
     /**
      * Sets value of HTTP header: Timing-Allow-Origin
-     * 
+     *
      * @param string $url
      */
     public function addTimingAllowOrigin(string $url = "*"): void
@@ -333,7 +333,7 @@ class Response
     
     /**
      * Delegates setting value of HTTP header: Tk
-     * 
+     *
      * @param string $status
      */
     public function setTk(string $status): void
@@ -346,7 +346,7 @@ class Response
     
     /**
      * Sets one of values of HTTP header: Trailer
-     * 
+     *
      * @param string $headerName
      */
     public function addTrailer(string $headerName = "*"): void
@@ -356,7 +356,7 @@ class Response
     
     /**
      * Sets one of values of HTTP header: Transfer-Encoding
-     * 
+     *
      * @param string $contentEncoding
      */
     public function addTransferEncoding(string $contentEncoding): void
@@ -369,7 +369,7 @@ class Response
     
     /**
      * Sets one of values of HTTP header: Transfer-Encoding
-     * 
+     *
      * @param string $headerName
      */
     public function addVary(string $headerName = "*"): void
@@ -379,7 +379,7 @@ class Response
     
     /**
      * Delegates setting value of HTTP header: WWW-Authenticate
-     * 
+     *
      * @param string $type
      * @param string $realm
      * @return WwwAuthenticate
@@ -404,7 +404,7 @@ class Response
     
     /**
      * Sets one of values of HTTP header: X-DNS-Prefetch-Control
-     * 
+     *
      * @param bool $value
      */
     public function setDNSPrefetchControl(bool $value = true): void
@@ -414,7 +414,7 @@ class Response
     
     /**
      * Sets one of values of HTTP header: X-Frame-Options
-     * 
+     *
      * @param string $option
      */
     public function setFrameOptions(string $option): void
@@ -427,7 +427,7 @@ class Response
     
     /**
      * Sets a header not present in IETF specifications
-     * 
+     *
      * @param string $name
      * @param string $value
      */
@@ -438,7 +438,7 @@ class Response
     
     /**
      * Gets all response headers as key-value pairs.
-     * 
+     *
      * @return string[string]
      */
     public function toArray(): array
@@ -546,4 +546,3 @@ class Response
         return $response;
     }
 }
-

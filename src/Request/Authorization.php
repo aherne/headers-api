@@ -11,13 +11,13 @@ class Authorization
     
     /**
      * Parses header value
-     * 
+     *
      * @param string $value
      */
     public function __construct(string $value)
     {
         $position = strpos($value, " ");
-        if($position === false) {
+        if ($position === false) {
             return;
         }
         $this->type = substr($value, 0, $position);
@@ -26,7 +26,7 @@ class Authorization
     
     /**
      * Gets authorization type (usually: basic)
-     * 
+     *
      * @return string
      */
     public function getType(): string
@@ -36,7 +36,7 @@ class Authorization
     
     /**
      * Gets authorization credentials (usually: some token)
-     * 
+     *
      * @return string
      */
     public function getCredentials(): string
@@ -44,4 +44,3 @@ class Authorization
         return $this->credentials;
     }
 }
-

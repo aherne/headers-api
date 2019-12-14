@@ -113,7 +113,7 @@ class CacheControl
     
     /**
      * Gets string representation of header value
-     * 
+     *
      * @return string
      */
     public function toString(): string
@@ -149,4 +149,3 @@ class CacheControl
         return implode(", ", $cache_control);
     }
 }
-

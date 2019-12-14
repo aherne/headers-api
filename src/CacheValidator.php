@@ -45,7 +45,7 @@ class CacheValidator
     
     /**
      * Matches If-Match, If-None-Match, If-Modified-Since, If-Unmodified-Since request headers to Cacheable and returns resulting http status code.
-     * 
+     *
      * @param Cacheable $cacheable
      * @param string $requestMethod
      * @return int
@@ -58,9 +58,9 @@ class CacheValidator
         // apply If-Match
         $ifMatch = $this->request->getIfMatch();
         if ($ifMatch) {
-            if(!$etag) {
+            if (!$etag) {
                 return 412;
-            } else if ($ifMatch == "*" || $etag == $ifMatch) {
+            } elseif ($ifMatch == "*" || $etag == $ifMatch) {
                 return 200;
             } else {
                 return 412;
@@ -72,7 +72,7 @@ class CacheValidator
         if ($ifNoneMatch) {
             if (!$etag || !in_array($requestMethod, ["GET","HEAD"])) {
                 return 412;
-            } else if ($ifNoneMatch == "*" || $ifNoneMatch != $etag) {
+            } elseif ($ifNoneMatch == "*" || $ifNoneMatch != $etag) {
                 return 200;
             } else {
                 return 304;
@@ -92,9 +92,9 @@ class CacheValidator
         // apply If-Modified-Since
         $ifModifiedSince = $this->request->getIfModifiedSince();
         if ($ifModifiedSince && in_array($requestMethod, ["GET","HEAD"])) {
-            if(!$date) {
+            if (!$date) {
                 return 412;
-            } else if ($date>$ifModifiedSince) {
+            } elseif ($date>$ifModifiedSince) {
                 return 200;
             } else {
                 return 304;
@@ -106,7 +106,7 @@ class CacheValidator
     
     /**
      * Matches Cache-Control request header to Cacheable to see if 304 HTTP status response should actually be HTTP status 200
-     * 
+     *
      * @param Cacheable $cacheable
      * @param CacheControl $cacheControl
      * @return bool
@@ -115,13 +115,13 @@ class CacheValidator
     {
         $date = $cacheable->getTime();
         if (!$date) {
-            // if resource has no time representation, ignore: max-age, max-stale, min-fresh 
+            // if resource has no time representation, ignore: max-age, max-stale, min-fresh
             return false;
         }
         
         $age = time() - $date;
         
-        $maxAge = $cacheControl->getMaxAge();        
+        $maxAge = $cacheControl->getMaxAge();
         if ($maxAge!==null && ($maxAge == -1 || $age > $maxAge)) {
             return true;
         }

@@ -11,23 +11,23 @@ class Condition
     
     /**
      * Sets up a condition based on start and end directives.
-     * 
+     *
      * @param string $start
      * @param string $end
      */
     public function __construct(string $start, string $end)
     {
-        if($start!=="") {
+        if ($start!=="") {
             $this->start = (int) $start;
         }
-        if($end!="") {
+        if ($end!="") {
             $this->end = (int) $end;
         }
     }
     
     /**
      * Gets value of range start
-     * 
+     *
      * @return int
      */
     public function getStart(): int

@@ -2,7 +2,7 @@
 namespace Lucinda\Headers;
 
 /**
- * Encapsulates preflight request headers that came along with an OPTIONS request method 
+ * Encapsulates preflight request headers that came along with an OPTIONS request method
  */
 class PreflightRequest
 {
@@ -37,7 +37,7 @@ class PreflightRequest
     
     /**
      * Gets value of HTTP header: Access-Control-Request-Headers
-     *  
+     *
      * @return array
      */
     public function getAccessControlRequestHeaders(): array
@@ -65,4 +65,3 @@ class PreflightRequest
         return $this->origin;
     }
 }
-

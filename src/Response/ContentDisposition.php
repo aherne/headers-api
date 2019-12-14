@@ -11,7 +11,7 @@ class ContentDisposition
     
     /**
      * Sets type (can be: inline, attachment)
-     * 
+     *
      * @param string $type
      */
     public function __construct(string $type)
@@ -21,7 +21,7 @@ class ContentDisposition
 
     /**
      * Sets attachment file name (in which case type MUST be: attachment)
-     * 
+     *
      * @param string $fileName
      * @param bool $isEncoded
      */

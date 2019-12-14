@@ -25,7 +25,7 @@ class Range
         $this->unit = substr($value, 0, $position);
         
         $matches = [];
-        preg_match_all("/(([0-9]+)?\-([0-9]+)?)/",substr($value, $position+1), $matches);
+        preg_match_all("/(([0-9]+)?\-([0-9]+)?)/", substr($value, $position+1), $matches);
         foreach ($matches[0] as $i=>$value) {
             $this->conditions[]=new Condition($matches[2][$i], $matches[3][$i]);
         }
@@ -33,7 +33,7 @@ class Range
     
     /**
      * Gets range unit (usually: bytes)
-     * 
+     *
      * @return string
      */
     public function getUnit(): string
@@ -43,7 +43,7 @@ class Range
     
     /**
      * Gets range conditions
-     * 
+     *
      * @return Condition[]
      */
     public function getConditions(): array

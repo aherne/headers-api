@@ -257,7 +257,7 @@ class Request
     
     /**
      * Gets accepted charsets from HTTP header: Accept-Charset
-     * 
+     *
      * @return string[]
      */
     public function getAcceptCharset(): array
@@ -377,7 +377,7 @@ class Request
     
     /**
      * Gets value of host from HTTP header: Forwarded
-     * 
+     *
      * @return string
      */
     public function getForwardedHost(): string
