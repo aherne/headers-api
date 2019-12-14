@@ -516,7 +516,7 @@ class Request
     }
     
     /**
-     * Gets headers not present in IETF specifications
+     * Gets headers received that were not present in IETF specifications
      *
      * @return array
      */

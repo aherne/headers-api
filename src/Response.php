@@ -43,6 +43,7 @@ class Response
     private $xContentTypeOptions;
     private $xDNSPrefetchControl;
     private $xFrameOptions;    
+    private $customHeaders = [];
         
     /**
      * Sets one of values of HTTP header: Accept-Patch
@@ -425,6 +426,17 @@ class Response
     }
     
     /**
+     * Sets a header not present in IETF specifications
+     * 
+     * @param string $name
+     * @param string $value
+     */
+    public function setCustomHeader(string $name, string $value)
+    {
+        $this->customHeaders[$name] = $value;
+    }
+    
+    /**
      * Gets all response headers as key-value pairs.
      * 
      * @return string[string]
@@ -527,6 +539,9 @@ class Response
         }
         if ($this->xFrameOptions) {
             $response["X-Frame-Options"] = $this->xFrameOptions;
+        }
+        if ($this->customHeaders) {
+            $response = array_merge($response, $this->customHeaders);
         }
         return $response;
     }
