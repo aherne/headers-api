@@ -1,0 +1,23 @@
+{
+    "name": "lucinda/headers",
+    "type": "library",
+    "description": "API encapsulating HTTP request and response headers along with cache validation",
+    "keywords": ["http request headers", "http response headers", "http headers", "cache validation", "http caching"],
+    "homepage": "https://github.com/aherne/headers-api",
+    "license": "MIT",
+    "require": {
+        "php": "^7.1"
+    },
+    "autoload": {
+    	"psr-4": {
+        	"Lucinda\\Headers\\": "src/"
+    	}
+    },
+    "authors": [
+        {
+            "name": "Lucian Popescu",
+            "email": "lucian.gabriel.popescu@gmail.com",
+            "role": "Developer"
+        }
+    ]
+}
