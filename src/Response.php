@@ -87,7 +87,7 @@ class Response
      *
      * @return CacheControl
      */
-    public function setCacheControl(): void
+    public function setCacheControl(): CacheControl
     {
         $cacheControl = new CacheControl();
         $this->cacheControl = $cacheControl;

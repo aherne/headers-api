@@ -6,7 +6,11 @@
     "homepage": "https://github.com/aherne/headers-api",
     "license": "MIT",
     "require": {
-        "php": "^7.1"
+        "php": "^7.1",
+        "ext-SimpleXML": "*"
+    },
+    "require-dev": {
+        "lucinda/unit-testing": "^1.0"
     },
     "autoload": {
     	"psr-4": {
