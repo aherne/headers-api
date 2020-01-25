@@ -38,6 +38,9 @@ class Request
     private $referrer;
     private $saveData = false;
     private $userAgent;
+    private $accessControlRequestHeaders = [];
+    private $accessControlRequestMethod;
+    private $origin;
     private $customHeaders = [];
     
     /**
@@ -66,6 +69,17 @@ class Request
                     preg_match_all("/([a-z]{2}(\-[A-Z]{2})?)(;q\=[0-9\.]+)?/", $value, $matches);
                     $this->acceptLanguage = (!empty($matches[1])?$matches[1]:[]);
                     break;
+                case "Access-Control-Request-Headers":
+                    $matches = [];
+                    preg_match_all("/\s*([^,]+)\s*/", $value, $matches);
+                    $this->accessControlRequestHeaders = (!empty($matches[1])?$matches[1]:[]);
+                    break;
+                case "Access-Control-Request-Method":
+                    $value = trim($value);
+                    if (in_array($value, ["GET","HEAD","POST","PUT","DELETE","CONNECT","OPTIONS","TRACE","PATCH"])) {
+                        $this->accessControlRequestMethod = $value;
+                    }
+                    break;
                 case "Authorization":
                     $this->authorization = new Authorization($value);
                     break;
@@ -74,6 +88,9 @@ class Request
                     break;
                 case "Connection":
                     // this header is handled by web server directly
+                    break;
+                case "Cookie":
+                    // this header is handled by php directly
                     break;
                 case "DNT":
                     $this->doNotTrack = (bool) $value;
@@ -119,6 +136,9 @@ class Request
                 case "Keep-Alive":
                     // this header is handled by web server directly
                     break;
+                case "Origin":
+                    $this->origin = $value;
+                    break;
                 case "Pragma":
                     if ($this->cacheControl==null && $value=="no-cache") {
                         $this->cacheControl = new CacheControl("no-cache");
@@ -134,11 +154,14 @@ class Request
                     $this->saveData = ($value=="on");
                     break;
                 case "TE":
-                    preg_match_all("/(gzip|compress|deflate|br|identity)/", $value, $matches);
+                    preg_match_all("/(gzip|compress|deflate|trailers)/", $value, $matches);
                     $this->acceptedTransferEncodings = (!empty($matches[1])?$matches[1]:[]);
                     break;
                 case "Upgrade-Insecure-Requests":
                     // this header is handled by web server directly
+                    break;
+                case "User-Agent":
+                    $this->userAgent = trim($value);
                     break;
                 case "Want-Digest":
                     preg_match_all("/([a-zA-Z\-0-9]+)(;q\=[0-9\.]+)?/", $value, $matches);
@@ -236,7 +259,7 @@ class Request
     private function setForwardedFor(string $value): void
     {
         $matches = [];
-        preg_match_all("/([a-zA-Z0-9\:\-]+)/", $value, $matches);
+        preg_match_all("/([a-zA-Z0-9\:\-\.]+)/", $value, $matches);
         if (!empty($matches[1])) {
             $this->originalIP = $matches[1][0];
             if (!empty($matches[1][1])) {
@@ -252,7 +275,7 @@ class Request
      */
     public function getAccept(): array
     {
-        return $this->acceptedMimeTypes;
+        return $this->accept;
     }
     
     /**
@@ -262,7 +285,7 @@ class Request
      */
     public function getAcceptCharset(): array
     {
-        return $this->acceptedCharsets;
+        return $this->acceptCharset;
     }
     
     /**
@@ -270,9 +293,9 @@ class Request
      *
      * @return string[]
      */
-    public function getAcceptedEncoding(): array
+    public function getAcceptEncoding(): array
     {
-        return $this->acceptedEncodings;
+        return $this->acceptEncoding;
     }
     
     /**
@@ -280,9 +303,9 @@ class Request
      *
      * @return string[]
      */
-    public function getAcceptedLanguage(): array
+    public function getAcceptLanguage(): array
     {
-        return $this->acceptedLanguages;
+        return $this->acceptLanguage;
     }
     
     /**
@@ -298,9 +321,9 @@ class Request
     /**
      * Gets value of HTTP header: Authorization
      *
-     * @return Authorization
+     * @return Authorization|null
      */
-    public function getAuthorization(): Authorization
+    public function getAuthorization(): ?Authorization
     {
         return $this->authorization;
     }
@@ -308,9 +331,9 @@ class Request
     /**
      * Gets value of HTTP header: Cache-Control
      *
-     * @return CacheControl
+     * @return CacheControl|null
      */
-    public function getCacheControl(): CacheControl
+    public function getCacheControl(): ?CacheControl
     {
         return $this->cacheControl;
     }
@@ -328,9 +351,9 @@ class Request
     /**
      * Gets value of HTTP header: Date
      *
-     * @return int
+     * @return int|null
      */
-    public function getDate(): int
+    public function getDate(): ?int
     {
         return $this->date;
     }
@@ -352,15 +375,15 @@ class Request
      */
     public function getSaveData(): bool
     {
-        return $this->isLowBandwidth();
+        return $this->saveData;
     }
     
     /**
      * Gets value of IP from HTTP headers: Forwarded, X-Forwarded-For
      *
-     * @return string
+     * @return string|null
      */
-    public function getForwardedIP(): string
+    public function getForwardedIP(): ?string
     {
         return $this->originalIP;
     }
@@ -368,9 +391,9 @@ class Request
     /**
      * Gets value of proxy from HTTP headers: Forwarded, X-Forwarded-For
      *
-     * @return string
+     * @return string|null
      */
-    public function getForwardedProxy(): string
+    public function getForwardedProxy(): ?string
     {
         return $this->originalProxy;
     }
@@ -378,9 +401,9 @@ class Request
     /**
      * Gets value of host from HTTP header: Forwarded
      *
-     * @return string
+     * @return string|null
      */
-    public function getForwardedHost(): string
+    public function getForwardedHost(): ?string
     {
         return $this->originalHostName;
     }
@@ -388,9 +411,9 @@ class Request
     /**
      * Gets value of protocol from HTTP header: Forwarded
      *
-     * @return string
+     * @return string|null
      */
-    public function getForwardedProtocol(): string
+    public function getForwardedProtocol(): ?string
     {
         return $this->originalProtocol;
     }
@@ -398,9 +421,9 @@ class Request
     /**
      * Gets client email from HTTP header: From
      *
-     * @return string
+     * @return string|null
      */
-    public function getFrom(): string
+    public function getFrom(): ?string
     {
         return $this->email;
     }
@@ -408,9 +431,9 @@ class Request
     /**
      * Gets value of HTTP header: Host
      *
-     * @return string
+     * @return string|null
      */
-    public function getHost(): string
+    public function getHost(): ?string
     {
         return $this->hostName;
     }
@@ -418,9 +441,9 @@ class Request
     /**
      * Gets value of date from HTTP header: If-Range
      *
-     * @return int
+     * @return int|null
      */
-    public function getIfRangeDate(): int
+    public function getIfRangeDate(): ?int
     {
         return $this->ifRangeDate;
     }
@@ -428,9 +451,9 @@ class Request
     /**
      * Gets value of etag from HTTP header: If-Range
      *
-     * @return string
+     * @return string|null
      */
-    public function getIfRangeEtag(): string
+    public function getIfRangeEtag(): ?string
     {
         return $this->ifRangeEtag;
     }
@@ -438,9 +461,9 @@ class Request
     /**
      * Gets value of HTTP header: Range
      *
-     * @return Range
+     * @return Range|null
      */
-    public function getRange(): Range
+    public function getRange(): ?Range
     {
         return $this->range;
     }
@@ -448,9 +471,9 @@ class Request
     /**
      * Gets source URL from HTTP header: Referer
      *
-     * @return string
+     * @return string|null
      */
-    public function getReferer(): string
+    public function getReferer(): ?string
     {
         return $this->referrer;
     }
@@ -458,9 +481,9 @@ class Request
     /**
      * Gets value of HTTP header: UserAgent
      *
-     * @return string
+     * @return string|null
      */
-    public function getUserAgent(): string
+    public function getUserAgent(): ?string
     {
         return $this->userAgent;
     }
@@ -478,9 +501,9 @@ class Request
     /**
      * Gets value of HTTP header: If-Match
      *
-     * @return string
+     * @return string|null
      */
-    public function getIfMatch(): string
+    public function getIfMatch(): ?string
     {
         return $this->ifMatch;
     }
@@ -488,9 +511,9 @@ class Request
     /**
      * Gets value of HTTP header: If-Modified-Since
      *
-     * @return int
+     * @return int|null
      */
-    public function getIfModifiedSince(): int
+    public function getIfModifiedSince(): ?int
     {
         return $this->ifModifiedSince;
     }
@@ -498,9 +521,9 @@ class Request
     /**
      * Gets value of HTTP header: If-None-Match
      *
-     * @return string
+     * @return string|null
      */
-    public function getIfNoneMatch(): string
+    public function getIfNoneMatch(): ?string
     {
         return $this->ifNoneMatch;
     }
@@ -508,11 +531,41 @@ class Request
     /**
      * Gets value of HTTP header: If-Unmodified-Since
      *
-     * @return int
+     * @return int|null
      */
-    public function getIfUnmodifiedSince(): int
+    public function getIfUnmodifiedSince(): ?int
     {
-        return $this->ifModifiedSince;
+        return $this->ifUnmodifiedSince;
+    }
+    
+    /**
+     * Gets value of HTTP header: Access-Control-Request-Headers
+     *
+     * @return array
+     */
+    public function getAccessControlRequestHeaders(): array
+    {
+        return $this->accessControlRequestHeaders;
+    }
+    
+    /**
+     * Gets value of HTTP header: Access-Control-Request-Method
+     *
+     * @return string|null
+     */
+    public function getAccessControlRequestMethod(): ?string
+    {
+        return $this->accessControlRequestMethod;
+    }
+    
+    /**
+     * Gets value of HTTP header: Origin
+     *
+     * @return string|null
+     */
+    public function getOrigin(): ?string
+    {
+        return $this->origin;
     }
     
     /**

@@ -15,7 +15,7 @@ class CacheValidator
      *
      * @param Request $request
      */
-    public function __construct(Request $request): void
+    public function __construct(Request $request)
     {
         $this->request = $request;
     }
@@ -82,9 +82,9 @@ class CacheValidator
         // apply If-Unmodified-Since
         $ifUnmodifiedSince = $this->request->getIfUnmodifiedSince();
         if ($ifUnmodifiedSince) {
-            if (!$date || $date>$ifUnmodifiedSince) {
+            if (!$date || $date>$ifUnmodifiedSince) {// if modified since TIME
                 return 412;
-            } else {
+            } else { // if not modified since TIME
                 return 200;
             }
         }
@@ -94,10 +94,13 @@ class CacheValidator
         if ($ifModifiedSince && in_array($requestMethod, ["GET","HEAD"])) {
             if (!$date) {
                 return 412;
-            } elseif ($date>$ifModifiedSince) {
+            } elseif ($date>$ifModifiedSince) { // if modified after TIME
                 return 200;
-            } else {
+            } elseif ($date==$ifModifiedSince) { // if modified at TIME
                 return 304;
+            } else { // if modified before TIME
+                // error situation (header date should NEVER be newer than source date) to answer with 200 OK, in order to force cache refresh
+                return 200;
             }
         }
         

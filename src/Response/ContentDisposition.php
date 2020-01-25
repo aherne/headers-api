@@ -38,9 +38,6 @@ class ContentDisposition
      */
     public function toString(): string
     {
-        if (!$this->type) {
-            return;
-        }
         return $this->type.($this->fileName?"; ".($this->fileName["encoded"]?"filename*":"filename")."=\"".$this->fileName["name"]."\"":"");
     }
 }

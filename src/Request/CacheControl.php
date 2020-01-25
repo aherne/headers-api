@@ -28,7 +28,7 @@ class CacheControl
                 $k = trim(substr($element, 0, $position));
                 $v = trim(substr($element, $position+1));
             } else {
-                $k = $element;
+                $k = trim($element);
             }
             
             switch ($k) {
@@ -39,13 +39,13 @@ class CacheControl
                     $this->no_store = true;
                     break;
                 case "max-age":
-                    $this->max_age = $this->_validateNumber($v);
+                    $this->max_age = (is_numeric($v)?(int) $v:null);
                     break;
                 case "max-stale":
-                    $this->max_stale = $this->_validateNumber($v);
+                    $this->max_stale = (is_numeric($v)?(int) $v:null);
                     break;
                 case "min-fresh":
-                    $this->min_fresh = $this->_validateNumber($v);
+                    $this->min_fresh = (is_numeric($v)?(int) $v:null);
                     break;
             }
         }
@@ -74,9 +74,9 @@ class CacheControl
     /**
      * Gets value of directive: max-age
      *
-     * @return int
+     * @return int|null
      */
-    public function getMaxAge(): int
+    public function getMaxAge(): ?int
     {
         return $this->max_age;
     }
@@ -84,9 +84,9 @@ class CacheControl
     /**
      * Gets value of directive: max-stale
      *
-     * @return int
+     * @return int|null
      */
-    public function getMaxStaleAge(): int
+    public function getMaxStaleAge(): ?int
     {
         return $this->max_stale;
     }
@@ -94,9 +94,9 @@ class CacheControl
     /**
      * Gets value of directive: min-fresh
      *
-     * @return int
+     * @return int|null
      */
-    public function getMinFreshAge(): int
+    public function getMinFreshAge(): ?int
     {
         return $this->min_fresh;
     }

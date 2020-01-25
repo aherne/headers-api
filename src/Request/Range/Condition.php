@@ -28,9 +28,9 @@ class Condition
     /**
      * Gets value of range start
      *
-     * @return int
+     * @return int|null
      */
-    public function getStart(): int
+    public function getStart(): ?int
     {
         return $this->start;
     }
@@ -38,10 +38,10 @@ class Condition
     /**
      * Gets value of range end
      *
-     * @return int
+     * @return int|null
      */
-    public function getEnd(): int
+    public function getEnd(): ?int
     {
-        return $this->start;
+        return $this->end;
     }
 }

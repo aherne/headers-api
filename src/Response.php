@@ -36,7 +36,7 @@ class Response
     private $strictTransportSecurity;
     private $timingAllowOrigin=[];
     private $tk; // <> DNT
-    private $trailer=[];
+    private $trailer;
     private $transferEncoding=[]; // <> TE
     private $vary = [];
     private $WWWAuthenticate; // <> Authorization
@@ -44,6 +44,12 @@ class Response
     private $xDNSPrefetchControl;
     private $xFrameOptions;
     private $customHeaders = [];
+    private $allowCredentials;
+    private $allowHeaders = []; // <> Access-Control-Request-Headers
+    private $allowMethods = [];
+    private $allowOrigin; // <> Origin
+    private $exposeHeaders = [];
+    private $maxAge;
         
     /**
      * Sets one of values of HTTP header: Accept-Patch
@@ -53,7 +59,7 @@ class Response
      */
     public function addAcceptPatch(string $mimeType, string $charset=null): void
     {
-        $this->acceptPatch[] = $mimeType.($charset?";".$charset:"");
+        $this->acceptPatch[] = $mimeType.($charset?";charset=".$charset:"");
     }
     
     /**
@@ -64,7 +70,7 @@ class Response
     public function setAcceptRanges(string $type): void
     {
         if (!in_array($type, ["bytes","none"])) {
-            return;
+            throw new UserException("Invalid value for header: Accept-Ranges");
         }
         $this->acceptRanges = $type;
     }
@@ -77,7 +83,7 @@ class Response
     public function addAllow(string $requestMethod): void
     {
         if (!in_array($requestMethod, ["GET","HEAD","POST","PUT","DELETE","CONNECT","OPTIONS","TRACE","PATCH"])) {
-            return;
+            throw new UserException("Invalid value for header: Allow");
         }
         $this->allow[] = $requestMethod;
     }
@@ -102,7 +108,7 @@ class Response
     public function addClearSiteData(string $directive = "*"): void
     {
         if (!in_array($directive, ["cache", "cookies","storage","executionContexts","*"])) {
-            return;
+            throw new UserException("Invalid value for header: Clear-Site-Data");
         }
         $this->clearSiteData[] = $directive;
     }
@@ -111,12 +117,12 @@ class Response
      * Delegates setting value of HTTP header: Content-Disposition
      *
      * @param string $type
-     * @return ContentDisposition
+     * @return ContentDisposition|null
      */
-    public function setContentDisposition(string $type): void
+    public function setContentDisposition(string $type): ?ContentDisposition
     {
         if (!in_array($type, ["inline", "attachment"])) {
-            return;
+            throw new UserException("Invalid value for header: Content-Disposition");
         }
         $contentDisposition = new ContentDisposition($type);
         $this->contentDisposition = $contentDisposition;
@@ -131,7 +137,7 @@ class Response
     public function addContentEncoding(string $contentEncoding): void
     {
         if (!in_array($contentEncoding, ["gzip", "compress", "deflate", "identity", "br"])) {
-            return;
+            throw new UserException("Invalid value for header: Content-Disposition");
         }
         $this->contentEncoding[] = $contentEncoding;
     }
@@ -144,7 +150,7 @@ class Response
     public function addContentLanguage(string $language): void
     {
         if (preg_match("/^[a-z]{2}(\-[A-Z]{2})?$/", $language)!==1) {
-            return;
+            throw new UserException("Invalid value for header: Content-Language");
         }
         $this->contentLanguage[] = $language;
     }
@@ -166,6 +172,9 @@ class Response
      */
     public function setContentLocation(string $url): void
     {
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            throw new UserException("Invalid value for header: Content-Location");
+        }
         $this->contentLocation = $url;
     }
     
@@ -183,6 +192,8 @@ class Response
             $this->contentRange = $unit." ".$start."-".$end."/".($size?$size:"*");
         } elseif ($size) {
             $this->contentRange = $unit." */".$size;
+        } else {
+            throw new UserException("Invalid arguments for header: Content-Range");
         }
     }
     
@@ -195,9 +206,9 @@ class Response
     public function setContentType(string $mimeType, string $charset = null): void
     {
         if (preg_match("/^(application|audio|example|font|image|model|text|video)\/(.*)$/", $mimeType)!==1) {
-            return;
+            throw new UserException("Invalid value for header: Content-Type");
         }
-        $this->contentType = $mimeType.($charset?"; ".$charset:"");
+        $this->contentType = $mimeType.($charset?"; charset=".$charset:"");
     }
     
     /**
@@ -208,7 +219,7 @@ class Response
     public function setCrossOriginResourcePolicy(string $option): void
     {
         if (!in_array($option, ["same-site", "same-origin", "cross-site"])) {
-            return;
+            throw new UserException("Invalid value for header: Cross-Origin-Resource-Policy");
         }
         $this->crossOriginResourcePolicy = $option;
     }
@@ -217,14 +228,14 @@ class Response
      * Sets one of values of HTTP header: Digest
      *
      * @param string $algorithm
-     * @param string $token
+     * @param string $value
      */
-    public function addDigest(string $algorithm, string $token): void
+    public function addDigest(string $algorithm, string $value): void
     {
         if (!in_array($algorithm, ["MD5", "UNIXsum", "UNIXcksum", "SHA", "SHA-256", "SHA-512"])) {
-            return;
+            throw new UserException("Invalid value for header: Digest");
         }
-        $this->digest[] = $algorithm."=".$token;
+        $this->digest[] = $algorithm."=".$value;
     }
     
     /**
@@ -238,13 +249,13 @@ class Response
     }
     
     /**
-     * Sets value of HTTP header: Content-Type
+     * Sets value of HTTP header: Expires
      *
      * @param int $unixTime
      */
     public function setExpirationTime(int $unixTime): void
     {
-        $this->expires = date("D, d M Y H:i:s T", $unixTime);
+        $this->expires = gmdate("D, d M Y H:i:s T", $unixTime);
     }
     
     /**
@@ -254,7 +265,7 @@ class Response
      */
     public function setLastModifiedTime(int $unixTime): void
     {
-        $this->lastModified = date("D, d M Y H:i:s T", $unixTime);
+        $this->lastModified = gmdate("D, d M Y H:i:s T", $unixTime);
     }
     
     /**
@@ -264,6 +275,9 @@ class Response
      */
     public function setLocation(string $url): void
     {
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            throw new UserException("Invalid value for header: Location");
+        }
         $this->location = $url;
     }
     
@@ -275,7 +289,7 @@ class Response
     public function setReferrerPolicy(string $option): void
     {
         if (!in_array($option, ["no-referrer", "no-referrer-when-downgrade", "origin", "origin-when-cross-origin", "same-origin", "strict-origin", "strict-origin-when-cross-origin", "unsafe-url"])) {
-            return;
+            throw new UserException("Invalid value for header: Referrer-Policy");
         }
         $this->referrerPolicy = $option;
     }
@@ -287,7 +301,7 @@ class Response
      */
     public function setRentryAfterDate(int $unixTime): void
     {
-        $this->rentryAfter = date("D, d M Y H:i:s T", $unixTime);
+        $this->rentryAfter = gmdate("D, d M Y H:i:s T", $unixTime);
     }
     
     /**
@@ -307,6 +321,9 @@ class Response
      */
     public function setSourceMap(string $url): void
     {
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            throw new UserException("Invalid value for header: Source-Map");
+        }
         $this->sourceMap = $url;
     }
     
@@ -328,6 +345,9 @@ class Response
      */
     public function addTimingAllowOrigin(string $url = "*"): void
     {
+        if ($url!="*" && !filter_var($url, FILTER_VALIDATE_URL)) {
+            throw new UserException("Invalid value for header: Source-Map");
+        }
         $this->timingAllowOrigin[] = $url;
     }
     
@@ -339,19 +359,19 @@ class Response
     public function setTk(string $status): void
     {
         if (!in_array($status, ["!", "?", "G", "N", "T", "C", "P", "D", "U"])) {
-            return;
+            throw new UserException("Invalid value for header: Tk");
         }
         $this->tk = $status;
     }
     
     /**
-     * Sets one of values of HTTP header: Trailer
+     * Sets value of HTTP header: Trailer
      *
-     * @param string $headerName
+     * @param string $headerNames
      */
-    public function addTrailer(string $headerName = "*"): void
+    public function setTrailer(string $headerNames): void
     {
-        $this->trailer[] = $headerName;
+        $this->trailer = $headerNames;
     }
     
     /**
@@ -362,7 +382,7 @@ class Response
     public function addTransferEncoding(string $contentEncoding): void
     {
         if (!in_array($contentEncoding, ["gzip", "compress", "deflate", "identity", "chunked"])) {
-            return;
+            throw new UserException("Invalid value for header: Transfer-Encoding");
         }
         $this->transferEncoding[] = $contentEncoding;
     }
@@ -384,10 +404,10 @@ class Response
      * @param string $realm
      * @return WwwAuthenticate
      */
-    public function setWWWAuthenticate(string $type, string $realm=""): void
+    public function setWWWAuthenticate(string $type, string $realm=""): WwwAuthenticate
     {
         if (!in_array($type, ["Basic","Bearer","Digest","HOBA","Mutual","Negotiate","OAuth","SCRAM-SHA-1","SCRAM-SHA-256","vapid"])) {
-            return;
+            throw new UserException("Invalid value for header: WWW-Authenticate");
         }
         $authenticate = new WwwAuthenticate($type, $realm);
         $this->WWWAuthenticate = $authenticate;
@@ -420,7 +440,7 @@ class Response
     public function setFrameOptions(string $option): void
     {
         if (!in_array($option, ["deny", "same-origin"])) {
-            return;
+            throw new UserException("Invalid value for header: X-Frame-Options");
         }
         $this->xFrameOptions = $option;
     }
@@ -434,6 +454,70 @@ class Response
     public function setCustomHeader(string $name, string $value)
     {
         $this->customHeaders[$name] = $value;
+    }
+    
+    /**
+     * Sets value of HTTP header: Access-Control-Allow-Credentials
+     */
+    public function setAccessControlAllowCredentials(): void
+    {
+        $this->allowCredentials = "true";
+    }
+    
+    /**
+     * Sets value of HTTP header: Access-Control-Allow-Headers
+     *
+     * @param string $headerName
+     */
+    public function addAccessControlAllowHeaders(string $headerName): void
+    {
+        $this->allowHeaders[] = $headerName;
+    }
+    
+    /**
+     * Sets value of HTTP header: Access-Control-Allow-Method
+     *
+     * @param string $requestMethod
+     */
+    public function addAccessControlAllowMethod(string $requestMethod): void
+    {
+        if (!in_array($requestMethod, ["GET","HEAD","POST","PUT","DELETE","CONNECT","OPTIONS","TRACE","PATCH"])) {
+            throw new UserException("Invalid value for header: Access-Control-Allow-Method");
+        }
+        $this->allowMethods[] = $requestMethod;
+    }
+    
+    /**
+     * Sets value of HTTP header: Access-Control-Allow-Origin
+     *
+     * @param string $origin
+     */
+    public function setAccessControlAllowOrigin(string $origin = "*"): void
+    {
+        if ($origin!="*" && !filter_var($origin, FILTER_VALIDATE_URL)) {
+            throw new UserException("Invalid value for header: Source-Map");
+        }
+        $this->allowOrigin = $origin;
+    }
+    
+    /**
+     * Sets value of HTTP header: Access-Control-Expose-Headers
+     *
+     * @param string $headerName
+     */
+    public function addAccessControlExposeHeaders(string $headerName = "*"): void
+    {
+        $this->exposeHeaders[] = $headerName;
+    }
+    
+    /**
+     * Sets value of HTTP header: Access-Control-Max-Age
+     *
+     * @param int $duration
+     */
+    public function setAccessControlMaxAge(int $duration): void
+    {
+        $this->maxAge = $duration;
     }
     
     /**
@@ -451,7 +535,7 @@ class Response
             $response["Accept-Ranges"] = $this->acceptRanges;
         }
         if ($this->allow) {
-            $response["Accept-Patch"] = implode(", ", $this->allow);
+            $response["Allow"] = implode(", ", $this->allow);
         }
         if ($this->cacheControl) {
             $response["Cache-Control"] = $this->cacheControl->toString();
@@ -489,7 +573,7 @@ class Response
         if ($this->etag) {
             $response["ETag"] = $this->etag;
         }
-        if ($this->etag) {
+        if ($this->expires) {
             $response["Expires"] = $this->expires;
         }
         if ($this->lastModified) {
@@ -520,7 +604,7 @@ class Response
             $response["Tk"] = $this->tk;
         }
         if ($this->trailer) {
-            $response["Trailer"] = implode(", ", $this->trailer);
+            $response["Trailer"] = $this->trailer;
         }
         if ($this->transferEncoding) {
             $response["Transfer-Encoding"] = implode(", ", $this->transferEncoding);
@@ -529,7 +613,7 @@ class Response
             $response["Vary"] = implode(", ", $this->vary);
         }
         if ($this->WWWAuthenticate) {
-            $response["WWWAuthenticate"] = $this->WWWAuthenticate->toString();
+            $response["WWW-Authenticate"] = $this->WWWAuthenticate->toString();
         }
         if ($this->xContentTypeOptions) {
             $response["X-Content-Type-Options"] = $this->xContentTypeOptions;
@@ -542,6 +626,26 @@ class Response
         }
         if ($this->customHeaders) {
             $response = array_merge($response, $this->customHeaders);
+        }
+        if ($this->allowCredentials) {
+            $response["Access-Control-Allow-Credentials"] = $this->allowCredentials;
+        }
+        // indicate which headers can be used during the actual request.
+        if ($this->allowHeaders) {
+            $response["Access-Control-Allow-Headers"] = implode(", ", $this->allowHeaders);
+        }
+        if ($this->allowMethods) {
+            $response["Access-Control-Allow-Methods"] = implode(", ", $this->allowMethods);
+        }
+        if ($this->allowOrigin) {
+            $response["Access-Control-Allow-Origin"] = $this->allowOrigin;
+        }
+        // indicates which headers can be exposed as part of the response
+        if ($this->exposeHeaders) {
+            $response["Access-Control-Expose-Headers"] = implode(", ", $this->exposeHeaders);
+        }
+        if ($this->maxAge) {
+            $response["Access-Control-Max-Age"] = $this->maxAge;
         }
         return $response;
     }

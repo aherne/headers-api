@@ -13,7 +13,6 @@ class CacheControl
     private $no_transform;
     private $must_revalidate;
     private $max_age;
-    private $proxy_age;
     private $proxy_revalidate;
     private $proxy_max_age;
     
@@ -73,16 +72,6 @@ class CacheControl
     public function setMaxAge(int $seconds): void
     {
         $this->max_age = $seconds;
-    }
-    
-    /**
-     * PROXY: Sets time object has been in proxy cache. A cached response is "fresh" if its age does not exceed its freshness lifetime.
-     *
-     * @param integer $seconds Usually 0, which means it was just retrieved from proxy.
-     */
-    public function setProxyAge(int $seconds): void
-    {
-        $this->proxy_age = $seconds;
     }
     
     /**
