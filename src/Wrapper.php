@@ -98,10 +98,10 @@ class Wrapper
             $headers = $this->policy->getAllowedRequestHeaders();
             if (!empty($headers)) {
                 foreach ($headers as $header) {
-                    $this->response->addAccessControlAllowHeaders($header);
+                    $this->response->addAccessControlAllowHeader($header);
                 }
             } else {
-                $this->response->addAccessControlAllowHeaders("*");
+                $this->response->addAccessControlAllowHeader("*");
             }
         }
         if ($headers = $this->policy->getAllowedResponseHeaders()) {
