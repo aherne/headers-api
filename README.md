@@ -171,7 +171,7 @@ As stated above, class [Lucinda\Headers\Response](https://github.com/aherne/head
 
 ## Validation
 
-Obviously, developers need to *know* headers received from client and *set* headers to send back in response, but the way they link depends on your application. There are two particular cases, however, in which request and response headers (and HTTP status) are bound logically:
+Obviously, developers need to *know* headers received from client and *set* headers to send back in response, but the way they link depends on your application. There are some particular cases, however, in which request and response headers (and HTTP status) are bound logically:
 
 - **[cache validation](#cache-validation)**: validating [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) headers based on [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) in order to *communicate with client browser cache* and set [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) headers in accordance to    
 - **[CORS validation](#CORS-validation)**: validating [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) headers based on [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) in order to *answer a CORS request* and set [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) headers in accordance to [CORS](https://fetch.spec.whatwg.org/#cors-protocol) protocol specifications
@@ -206,23 +206,23 @@ The two methods of communication described above are not mutually exclusive. Mat
 
 #### How Is Cache Validation Implemented
 
-To set cache-related response headers:
+To set cache-related response headers, using following [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) methods:
 
-| Header | Class | Method |
-| --- | --- | --- |
-| [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) | [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) | setCacheControl |
-| [ETag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) | [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) | setEtag |
-| [Last-Modified](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified) | [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) | setLastModifiedTime |
+| Header | Method |
+| --- | --- |
+| [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) | setCacheControl |
+| [ETag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) | setEtag |
+| [Last-Modified](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified) | setLastModifiedTime |
 
-To read cache-related request headers:
+To read cache-related request headers, using following [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) methods:
 
-| Header | Class | Method |
-| --- | --- | --- |
-| [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) | [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) | getCacheControl |
-| [If-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Match) | [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) | getIfMatch |
-| [If-None-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match) | [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) | getIfNoneMatch |
-| [If-Modified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) | [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) | getIfModifiedSince |
-| [If-Unmodified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Unmodified-Since) | [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) | getIfUnmodifiedSince |
+| Header | Method |
+| --- | --- |
+| [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) | getCacheControl |
+| [If-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Match) | getIfMatch |
+| [If-None-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match) | getIfNoneMatch |
+| [If-Modified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) | getIfModifiedSince |
+| [If-Unmodified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Unmodified-Since) | getIfUnmodifiedSince |
 
 Fortunately, all of this is done automatically by API once you are running *validateCache* method of [Lucinda\Headers\Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) object. This method:
 
@@ -245,4 +245,41 @@ Possible http status codes returned are:
 
 ### CORS Validation
 
-linking request headers *Origin*, *Access-Control-Request-Method*, *Access-Control-Request-Headers* to response headers *Access-Control-Allow-Origin*, *Access-Control-Allow-Methods*, *Access-Control-Allow-Headers* in accordance to [CORS](https://fetch.spec.whatwg.org/#cors-protocol) protocol
+**[CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)** preliminary request is triggered automatically by client browser when it encounteres a situation where *preflight* is mandated by security reasons. 
+
+#### How CORS Validation Works
+
+What triggers a preflight request falls outside the scope of this API documentation. If you want to learn more, check:
+
+- [simple requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Simple_requests), to understand how can a preflight request be avoided
+- [preflighted requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Preflighted_requests), to understand what triggers a preflight request and what happens next
+
+#### How Is CORS Validation Implemented
+
+To set CORS-related response headers, using following [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) methods:
+
+| Header | Method |
+| --- | --- |
+| [Access-Control-Allow-Credentials](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials) | setAccessControlAllowCredentials |
+| [Access-Control-Allow-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers) | addAccessControlAllowHeader | 
+| [Access-Control-Allow-Methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods) | addAccessControlAllowMethod | 
+| [Access-Control-Allow-Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin) | setAccessControlAllowOrigin |
+| [Access-Control-Expose-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers) | addAccessControlExposeHeaders |
+| [Access-Control-Max-Age](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age) | setAccessControlMaxAge |
+
+To read CORS-related request headers, using following [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) methods:
+
+| Header | Method |
+| --- | --- |
+| [Access-Control-Request-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers) | getAccessControlRequestHeaders |
+| [Access-Control-Request-Method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method) | getAccessControlRequestMethod |
+| [Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin) | getOrigin |
+
+Fortunately, all of this is done automatically by API once you are running *validateCORS* method of [Lucinda\Headers\Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) object. This method:
+
+- requires developers to put origin hostname (eg: https://www.google.com) as argument. This cannot be set in XML since it may differ by development environment! If none is provided, any [Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin) is considered valid!
+- sets CORS response headers based on *allow_credentials*, *cors_max_age*, *allowed_request_headers*, *allowed_response_headers*  XML attributes encapsulated by [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) and CORS request headers received
+
+## Display
+
+To be continued...
