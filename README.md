@@ -132,8 +132,8 @@ As stated above, class [Lucinda\Headers\Response](https://github.com/aherne/head
 | setAcceptRanges | bool $value | void | Sets whether or not range requests are accepted | Accept-Ranges |
 | addAllow | string $requestMethod | void | Sets a request method server accepts for requested resource | Allow |
 | addClearSiteData | string $directive = "*" | void | Sets a browsing data (cookies, storage, cache) to be cleared on client | Clear-Site-Data |
-| setCacheControl | void | CacheControl | Sets HTTP caching settings to be used by client | Cache-Control |
-| setContentDisposition | string $type | ?ContentDisposition | Sets how content will be displayed (inline or attachment) | Content-Disposition |
+| setCacheControl | void | [Lucinda\Headers\Response\CacheControl](https://github.com/aherne/headers-api/blob/master/src/Response/CacheControl.php) | Sets HTTP caching settings to be used by client | Cache-Control |
+| setContentDisposition | string $type | [Lucinda\Headers\Response\ContentDisposition](https://github.com/aherne/headers-api/blob/master/src/Response/ContentDisposition.php) | Sets how content will be displayed (inline or attachment) | Content-Disposition |
 | addContentEncoding | string $contentEncoding | void | Adds an encoding applied in compressing response | Content-Encoding |
 | addContentLanguage | string $language | void | Adds a language to associate response with  | Content-Language |
 | setContentLength | int $length | void | Sets byte length of response | Content-Length |
@@ -157,7 +157,7 @@ As stated above, class [Lucinda\Headers\Response](https://github.com/aherne/head
 | setTrailer | string $headerNames | void | Allows the sender to include additional fields at the end of chunked messages | Trailer |
 | addTransferEncoding | string $contentEncoding | void | Adds form of encoding used to safely transfer the payload body to the user. | Transfer-Encoding |
 | addVary | string $headerName = "*" | void | Adds a request header to decide in future whether a cached response can be used | Vary |
-| setWWWAuthenticate | string $type, string $realm="" | WwwAuthenticate |  Defines the authentication method that should be used to gain access to a resource | WWW-Authenticate |
+| setWWWAuthenticate | string $type, string $realm="" | [Lucinda\Headers\Response\WwwAuthenticate](https://github.com/aherne/headers-api/blob/master/src/Response/WwwAuthenticate.php) |  Defines the authentication method that should be used to gain access to a resource | WWW-Authenticate |
 | setDNSPrefetchControl | bool $value = true | void | Activates DNS prefetching on client | X-DNS-Prefetch-Control |
 | setFrameOptions | string $option | void | Indicates whether or not a browser should be allowed to render a page in a frame / iframe / embed / object | X-Frame-Options |
 | setAccessControlAllowCredentials | void | void | Answers to **CORS** request by signaling credentials are to be exposed | Access-Control-Allow-Credentials |

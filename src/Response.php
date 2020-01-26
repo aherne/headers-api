@@ -116,7 +116,7 @@ class Response
      * @param string $type
      * @return ContentDisposition|null
      */
-    public function setContentDisposition(string $type): ?ContentDisposition
+    public function setContentDisposition(string $type): ContentDisposition
     {
         if (!in_array($type, ["inline", "attachment"])) {
             throw new UserException("Invalid value for header: Content-Disposition");
