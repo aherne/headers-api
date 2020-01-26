@@ -3,9 +3,9 @@
 This API encapsulates HTTP request headers received from client and response headers to send back, offering an ability to bind them for cache and CORS validation. That task can be achieved using following steps:
 
 - **[configuration](#configuration)**: setting up an XML file where cache/CORS validation policies are configured
-- **[initialization](#initialization)**: using [Lucinda\Headers\Wrapper](https://github.com/aherne/headers-api/src/Wrapper.php) to read above XML into a [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/src/Policy.php), read HTTP request headers into a [Lucinda\Headers\Request](https://github.com/aherne/headers-api/src/Request.php) then initialize [Lucinda\Headers\Response](https://github.com/aherne/headers-api/src/Response.php), encapsulating HTTP response headers logic.
-- **[validation](#validation)**: using above to perform cache/CORS validation and set [Lucinda\Headers\Response](https://github.com/aherne/headers-api/src/Response.php) accordingly
-- **[display](#display)**: sending back response to caller using [Lucinda\Headers\Response](https://github.com/aherne/headers-api/src/Response.php) headers compiled above (or set individually by user)
+- **[initialization](#initialization)**: using [Lucinda\Headers\Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) to read above XML into a [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php), read HTTP request headers into a [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) then initialize [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php), encapsulating HTTP response headers logic.
+- **[validation](#validation)**: using above to perform cache/CORS validation and set [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) accordingly
+- **[display](#display)**: sending back response to caller using [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) headers compiled above (or set individually by user)
 
 API is fully PSR-4 compliant, only requiring PHP7.1+ interpreter and SimpleXML extension. To quickly see how it works, check:
 
@@ -67,25 +67,25 @@ Where:
 
 ## Initialization
 
-Now that policies have been configured, they can be bound to request and response using  [Lucinda\Headers\Wrapper](https://github.com/aherne/headers-api/src/Wrapper.php), which creates then works with three objects:
+Now that policies have been configured, they can be bound to request and response using  [Lucinda\Headers\Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php), which creates then works with three objects:
 
-- [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/src/Policy.php): encapsulates validation policies detected from XML
-- [Lucinda\Headers\Request](https://github.com/aherne/headers-api/src/Request.php): encapsulates HTTP request headers received from client in accordance to [RFC-7231](https://tools.ietf.org/html/rfc7231) specification
-- [Lucinda\Headers\Response](https://github.com/aherne/headers-api/src/Response.php): encapsulates HTTP response headers to send back to client in accordance to [RFC-7231](https://tools.ietf.org/html/rfc7231) specification
+- [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php): encapsulates validation policies detected from XML
+- [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php): encapsulates HTTP request headers received from client in accordance to [RFC-7231](https://tools.ietf.org/html/rfc7231) specification
+- [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php): encapsulates HTTP response headers to send back to client in accordance to [RFC-7231](https://tools.ietf.org/html/rfc7231) specification
 
-Once set, [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/src/Policy.php) and [Lucinda\Headers\Request](https://github.com/aherne/headers-api/src/Request.php) become immutable (since *the past cannot be changed*). [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/src/Policy.php) will only be used internally while [Lucinda\Headers\Request](https://github.com/aherne/headers-api/src/Request.php) will only expose getters. [Lucinda\Headers\Response](https://github.com/aherne/headers-api/src/Response.php), on the other hand, is only instanced while setting remains in developer's responsibility. This is because there is no default linking between request and response headers, unless you are performing **[validation](#validation)**. In light of above, public methods defined by [Lucinda\Headers\Wrapper](https://github.com/aherne/headers-api/src/Wrapper.php) are:
+Once set, [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) and [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) become immutable (since *the past cannot be changed*). [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) will only be used internally while [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) will only expose getters. [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php), on the other hand, is only instanced while setting remains in developer's responsibility. This is because there is no default linking between request and response headers, unless you are performing **[validation](#validation)**. In light of above, public methods defined by [Lucinda\Headers\Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) are:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
 | __construct | \SimpleXMLElement $xml, string $requestedPage, array $requestHeaders | void | Creates Policy based on XML and requested page, sets up Request object based on request headers and initializes Response object |
-| getRequest| void | [Lucinda\Headers\Request](https://github.com/aherne/headers-api/src/Request.php) | Gets object encapsulating HTTP request headers received |
-| validateCache | [Lucinda\Headers\Cacheable](https://github.com/aherne/headers-api/src/Cacheable.php) $cacheable, string $requestMethod | int | Performs HTTP cache validation based on user-defined Cacheable representation of requested resource  |
+| getRequest| void | [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) | Gets object encapsulating HTTP request headers received |
+| validateCache | [Lucinda\Headers\Cacheable](https://github.com/aherne/headers-api/blob/master/src/Cacheable.php) $cacheable, string $requestMethod | int | Performs HTTP cache validation based on user-defined Cacheable representation of requested resource  |
 | validateCORS | string $origin = null | void | Performs CORS request validation based on user-defined origin (*PROTOCOL://HOSTNAME*, eg: https://www.google.com). If none provided, *Access-Control-Allow-Origin* will equal "*" (all origins supported)! |
-| getResponse | void | [Lucinda\Headers\Response](https://github.com/aherne/headers-api/src/Response.php) | Gets object encapsulating HTTP response headers to send back |
+| getResponse | void | [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) | Gets object encapsulating HTTP response headers to send back |
 
 ### Request
 
-As stated above, class [Lucinda\Headers\Request](https://github.com/aherne/headers-api/src/Request.php) encapsulates HTTP request headers received from client. Each method inside (minus *__construct*) corresponds to a header:
+As stated above, class [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) encapsulates HTTP request headers received from client. Each method inside (minus *__construct*) corresponds to a header:
 
 | Method | Arguments | Returns | Description | Header |
 | --- | --- | --- | --- | --- |
@@ -95,8 +95,8 @@ As stated above, class [Lucinda\Headers\Request](https://github.com/aherne/heade
 | getAcceptEncoding() | void | array | Gets encodings accepted by client | Accept-Encoding |
 | getAcceptLanguage() | void | array | Gets languages accepted by client | Accept-Language |
 | getTE() | void | array | Gets transfer encodings accepted by client | TE |
-| getAuthorization() | void | ?[Lucinda\Headers\Request\Authorization](https://github.com/aherne/headers-api/src/Request/Authorization.php) | Gets credentials for user authentication | Authorization |
-| getCacheControl() | void | ?[Lucinda\Headers\Request\CacheControl](https://github.com/aherne/headers-api/src/Request/CacheControl.php) | Gets HTTP caching settings requested by client | Cache-Control |
+| getAuthorization() | void | ?[Lucinda\Headers\Request\Authorization](https://github.com/aherne/headers-api/blob/master/src/Request/Authorization.php) | Gets credentials for user authentication | Authorization |
+| getCacheControl() | void | ?[Lucinda\Headers\Request\CacheControl](https://github.com/aherne/headers-api/blob/master/src/Request/CacheControl.php) | Gets HTTP caching settings requested by client | Cache-Control |
 | getDNT() | void | bool | Gets whether or not client does not want to be tracked | DNT |
 | getDate() | void | ?int | Gets UNIX timestamp of date request came with | Date |
 | getExpect() | void | bool | Gets whether client is about to send a large request | Expect |
@@ -109,7 +109,7 @@ As stated above, class [Lucinda\Headers\Request](https://github.com/aherne/heade
 | getHost() | void | ?string | Gets hostname requested by client | Host |
 | getIfRangeDate() | void | ?int | Gets UNIX timestamp of range condition, if present  | If-Range |
 | getIfRangeEtag() | void | ?string | Gets ETag of range condition, if present | If-Range |
-| getRange() | void | ?[Lucinda\Headers\Request\Range](https://github.com/aherne/headers-api/src/Request/Range.php) | Gets bytes range requested by client from a big document | Range |
+| getRange() | void | ?[Lucinda\Headers\Request\Range](https://github.com/aherne/headers-api/blob/master/src/Request/Range.php) | Gets bytes range requested by client from a big document | Range |
 | getReferer() | void | ?string | Gets address of the previous web page from which a link to the currently requested page was followed | Referer |
 | getUserAgent() | void | ?string | Gets signature of client browser | User-Agent |
 | getWantDigest() | void | array | Gets details of digest client wants in response | Want-Digest |
@@ -124,7 +124,7 @@ As stated above, class [Lucinda\Headers\Request](https://github.com/aherne/heade
 
 ### Response
 
-As stated above, class [Lucinda\Headers\Response](https://github.com/aherne/headers-api/src/Response.php) encapsulates HTTP response headers to send back. Each method inside (minus *toArray*) corresponds to a header:
+As stated above, class [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) encapsulates HTTP response headers to send back. Each method inside (minus *toArray*) corresponds to a header:
 
 | Method | Arguments | Returns | Description | Header |
 | --- | --- | --- | --- | --- |
@@ -173,12 +173,14 @@ As stated above, class [Lucinda\Headers\Response](https://github.com/aherne/head
 
 Obviously, developers need to *know* headers received from client and *set* headers to send back in response, but the way they link depends on your application. There are two particular cases, however, in which request and response headers (and HTTP status) are bound logically:
 
-- **[cache validation](#cache-validation)**: validating [Lucinda\Headers\Request](https://github.com/aherne/headers-api/src/Request.php) headers based on [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/src/Policy.php) in order to *communicate with client browser cache* and set [Lucinda\Headers\Response](https://github.com/aherne/headers-api/src/Response.php) headers in accordance to    
-- **[CORS validation](#CORS-validation)**: validating [Lucinda\Headers\Request](https://github.com/aherne/headers-api/src/Request.php) headers based on [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/src/Policy.php) in order to *answer a CORS request* and set [Lucinda\Headers\Response](https://github.com/aherne/headers-api/src/Response.php) headers in accordance to [CORS](https://fetch.spec.whatwg.org/#cors-protocol) protocol specifications
+- **[cache validation](#cache-validation)**: validating [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) headers based on [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) in order to *communicate with client browser cache* and set [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) headers in accordance to    
+- **[CORS validation](#CORS-validation)**: validating [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) headers based on [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) in order to *answer a CORS request* and set [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) headers in accordance to [CORS](https://fetch.spec.whatwg.org/#cors-protocol) protocol specifications
 
 ### Cache Validation
 
 The purpose of cache validation is to communicate with client browser's cache based on headers and make your site display instantly whenever possible. The language of communication is identified by [RFC-7232](https://tools.ietf.org/html/rfc7232) and [RFC-7234](https://tools.ietf.org/html/rfc7234) specifications both your site (via this API) and your browser must obey.
+
+#### How Validation Works
 
 HTTP standard allows you following simple method of communication based on conditional headers:
 
