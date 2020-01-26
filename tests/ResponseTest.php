@@ -18,7 +18,7 @@ class ResponseTest
     public function setAcceptRanges()
     {
         $response = new Response();
-        $response->setAcceptRanges("bytes");
+        $response->setAcceptRanges(true);
         return new Result($response->toArray()==["Accept-Ranges"=>"bytes"]);
     }
         
@@ -314,11 +314,11 @@ Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
     }
         
 
-    public function addAccessControlAllowHeaders()
+    public function addAccessControlAllowHeader()
     {
         $response = new Response();
-        $response->addAccessControlAllowHeaders("X-Custom-Header");
-        $response->addAccessControlAllowHeaders("Upgrade-Insecure-Requests");
+        $response->addAccessControlAllowHeader("X-Custom-Header");
+        $response->addAccessControlAllowHeader("Upgrade-Insecure-Requests");
         return new Result($response->toArray()==["Access-Control-Allow-Headers"=>'X-Custom-Header, Upgrade-Insecure-Requests']);
     }
         

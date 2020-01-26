@@ -65,14 +65,11 @@ class Response
     /**
      * Sets value of HTTP header: Accept-Ranges
      *
-     * @param string $type
+     * @param bool $value
      */
-    public function setAcceptRanges(string $type): void
+    public function setAcceptRanges(bool $value): void
     {
-        if (!in_array($type, ["bytes","none"])) {
-            throw new UserException("Invalid value for header: Accept-Ranges");
-        }
-        $this->acceptRanges = $type;
+        $this->acceptRanges = ($value?"bytes":"none");
     }
     
     /**
@@ -469,7 +466,7 @@ class Response
      *
      * @param string $headerName
      */
-    public function addAccessControlAllowHeaders(string $headerName): void
+    public function addAccessControlAllowHeader(string $headerName): void
     {
         $this->allowHeaders[] = $headerName;
     }
