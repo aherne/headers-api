@@ -88,7 +88,7 @@ Once set, [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/src/Pol
 As stated above, class [Lucinda\Headers\Request](https://github.com/aherne/headers-api/src/Request.php) encapsulates HTTP request headers received from client. Each method inside (minus *__construct*) corresponds to a header:
 
 | Method | Arguments | Returns | Description | Header |
-| --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | __construct | array $headers | void | Reads headers received from client | - |
 | getAccept() | void | array | Gets content types accepted by client | Accept |
 | getAcceptCharset() | void | array | Gets charsets accepted by client| Accept-Charset |
@@ -127,7 +127,7 @@ As stated above, class [Lucinda\Headers\Request](https://github.com/aherne/heade
 As stated above, class [Lucinda\Headers\Response](https://github.com/aherne/headers-api/src/Response.php) encapsulates HTTP response headers to send back. Each method inside (minus *toArray*) corresponds to a header:
 
 | Method | Arguments | Returns | Description | Header |
-| --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | addAcceptPatch | string $mimeType, string $charset=null | void | Adds a content type for whom PATCH requests are accepted | Accept-Patch |
 | setAcceptRanges | bool $value | void | Sets whether or not range requests are accepted | Accept-Ranges |
 | addAllow | string $requestMethod | void | Sets a request method server accepts for requested resource | Allow |
