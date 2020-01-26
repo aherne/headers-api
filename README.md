@@ -11,7 +11,7 @@ API is fully PSR-4 compliant, only requiring PHP7.1+ interpreter and SimpleXML e
 
 - **[installation](#installation)**: describes how to install API on your computer, in light of steps above
 - **[unit tests](#unit-tests)**: API has 100% Unit Test coverage, using [UnitTest API](https://github.com/aherne/unit-testing) instead of PHPUnit for greater flexibility
-- **[example](#examples)**: shows a deep example of API functionality based on unit tests
+- **[examples](#examples)**: shows a deep example of API functionality based on unit tests
 
 
 ## Configuration
@@ -122,6 +122,10 @@ As stated above, class [Lucinda\Headers\Request](https://github.com/aherne/heade
 | getOrigin() | void | ?string | Gets client hostname to validate access to requested resource, sent automatically in **CORS** preliminary request | [Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin) |
 | getCustomHeaders() | void | array | Gets all non-standard headers requested by client as header name:value array | (any) |
 
+Following limitations apply:
+
+- weak or multiple ETags are not supported
+
 ### Response
 
 As stated above, class [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) encapsulates HTTP response headers to send back. Each method inside (minus *toArray*) corresponds to a header:
@@ -168,6 +172,10 @@ As stated above, class [Lucinda\Headers\Response](https://github.com/aherne/head
 | setAccessControlMaxAge | int $duration | void | Sets how long response to a CORS request should be cached (in seconds) | [Access-Control-Max-Age](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age) |
 | setCustomHeader | string $name, string $value | void | Sets a custom header by name and value (this **may trigger CORS requests**) | (any) |
 | toArray | void | array | Converts all headers set to a name:value array ready to be sent back to client | - |
+
+Following limitations apply:
+
+- weak or multiple ETags are not supported
 
 ## Validation
 
@@ -282,4 +290,74 @@ Fortunately, all of this is done automatically by API once you are running *vali
 
 ## Display
 
-To be continued...
+Once response headers, status and body (if any) become available, you are finally able to send headers back to client. Example:
+
+```php
+$wrapper = new Wrapper("configuration.xml", $_SERVER["REQUEST_URI"], getallheaders());
+// developer now reads request headers, sets response headers, compiles $responseBody then applies cache validation:
+$httpStatus = $wrapper->validateCache(new MyCacheable($responseBody), $_SERVER["REQUEST_METHOD"]);
+// now response is ready for display
+http_response_code(httpStatus);
+$headers = $wrapper->getResponse()->toArray();
+foreach ($headers as $name=>$value) {
+    header($name.": ".$value);
+}
+if ($httpStatus!=304) {
+    echo $responseBody;
+}
+```
+
+## Installation
+
+First choose a folder, associate it to a domain then write this command there using console:
+
+```console
+composer require lucinda/headers
+```
+
+Then create a *configuration.xml* file holding configuration settings (see [configuration](#configuration) above) and a *index.php* file (see [initialization](#initialization) and [display](#display)) in project root with following code:
+
+```php
+require(__DIR__."/vendor/autoload.php");
+$wrapper = new Wrapper("configuration.xml", $_SERVER["REQUEST_URI"], getallheaders());
+// if request is CORS, response can be done immediately
+if ($_SERVER["REQUEST_METHOD"]=="OPTIONS") {
+    $wrapper->validateCORS((!empty($_SERVER['HTTPS'])?"https":"http")."://".$_SERVER["SERVER_NAME"]);
+    $headers = $wrapper->getResponse()->toArray();
+    foreach ($headers as $name=>$value) {
+        header($name.": ".$value);
+    }
+    exit();
+}
+// developer reads request headers, sets response headers, compiles $responseBody
+// developer creates a Lucinda\Headers\Cacheable instance (MyCacheable), able to convert a response body into an etag then performs cache validation
+$httpStatus = $wrapper->validateCache(new MyCacheable($responseBody), $_SERVER["REQUEST_METHOD"]);
+// now response is ready for display
+http_response_code(httpStatus);
+$headers = $wrapper->getResponse()->toArray();
+foreach ($headers as $name=>$value) {
+    header($name.": ".$value);
+}
+if ($httpStatus!=304) {
+    echo $responseBody;
+}
+```
+
+Then make sure domain is available to world-wide-web and all request that point to it are rerouted to index.php:
+
+```
+RewriteEngine on
+RewriteRule ^(.*)$ index.php
+```
+
+## Unit Tests
+
+For tests and examples, check following files/folders in API sources:
+
+- [test.php](https://github.com/aherne/headers-api/blob/master/test.php): runs unit tests in console
+- [unit-tests.xml](https://github.com/aherne/headers-api/blob/master/unit-tests.xml): sets up unit tests and mocks "loggers" tag
+- [tests](https://github.com/aherne/headers-api/blob/master/tests): unit tests for classes from [src](https://github.com/aherne/headers-api/blob/master/src) folder
+
+## Examples
+
+To see examples how request headers are parsed by [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php), check its matching [UnitTest](https://github.com/aherne/headers-api/blob/master/tests/Request.php). To see how response headers are set by [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php), check its matching [UnitTest](https://github.com/aherne/headers-api/blob/master/tests/Response.php). To understand everything by example from a HTTP headers perspective, there is no better documentation than the one provided by [Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)!
