@@ -330,7 +330,7 @@ if ($_SERVER["REQUEST_METHOD"]=="OPTIONS") {
     exit();
 }
 // developer reads request headers, sets response headers, compiles $responseBody
-// developer creates a Lucinda\Headers\Cacheable instance (MyCacheable), able to convert a response body into an etag then performs cache validation
+// developer creates a Lucinda\Headers\Cacheable instance (MyCacheable), able to convert $responseBody into an ETag string, then performs cache validation
 $httpStatus = $wrapper->validateCache(new MyCacheable($responseBody), $_SERVER["REQUEST_METHOD"]);
 // now response is ready for display
 http_response_code(httpStatus);
@@ -360,4 +360,4 @@ For tests and examples, check following files/folders in API sources:
 
 ## Examples
 
-To see examples how request headers are parsed by [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php), check its matching [UnitTest](https://github.com/aherne/headers-api/blob/master/tests/Request.php). To see how response headers are set by [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php), check its matching [UnitTest](https://github.com/aherne/headers-api/blob/master/tests/Response.php). To understand everything by example from a HTTP headers perspective, there is no better documentation than the one provided by [Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)!
+To see examples how request headers are parsed by [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php), check its matching [UnitTest](https://github.com/aherne/headers-api/blob/master/tests/RequestTest.php). To see how response headers are set by [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php), check its matching [UnitTest](https://github.com/aherne/headers-api/blob/master/tests/ResponseTest.php). To see detailed examples of each headers and understand them in greatest detail, there is no better documentation than the one provided by [Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)!
