@@ -30,7 +30,7 @@ class PolicyLocator
     {
         $parent = $xml->headers;
         if (!$parent) {
-            throw new ConfigurationException("Tag 'http_caching' missing");
+            throw new ConfigurationException("Tag 'headers' missing");
         }
         
         // get default policy
