@@ -50,8 +50,8 @@ Example:
 Minimal syntax of this tag is:
 
 ```xml
-<routes roles="...">
-    <route url="..." roles="..."/>
+<routes>
+    <route url="..." no_cache="..." cache_expiration="..." allowed_methods="..."/>
     ...
 </routes>
 ```
@@ -64,7 +64,14 @@ Where:
         - *no_cache*: (optional) disables HTTP caching for respective route (can be 0 or 1; 0 is default)
         - *cache_expiration*: (optional) duration in seconds respective route responses in site will be cached without revalidation (must be a positive number)
         - *allowed_methods*: (optional) list of HTTP request methods supported by respective route. If none are provided and a CORS *Access-Control-Request-Method* is requested, that method is assumed as supported!
+Example:
 
+```xml
+<routes>
+    <route url="index" no_cache="0" cache_expiration="10" allowed_methods="GET"/>
+    <route url="login" no_cache="1" allowed_methods="GET,POST"/>    
+</routes>
+```
 ## Initialization
 
 Now that policies have been configured, they can be bound to request and response using  [Lucinda\Headers\Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php), which creates then works with three objects:
