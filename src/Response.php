@@ -448,7 +448,7 @@ class Response
      * @param string $name
      * @param string $value
      */
-    public function setCustomHeader(string $name, string $value)
+    public function setCustomHeader(string $name, string $value): void
     {
         $this->customHeaders[$name] = $value;
     }
