@@ -107,18 +107,18 @@ Once set, [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/ma
 | validateCORS | string $origin = null | void | Performs CORS request validation based on user-defined origin (*PROTOCOL://HOSTNAME*, eg: https://www.google.com). If none provided, *Access-Control-Allow-Origin* will equal "*" (all origins supported)! |
 | getResponse | void | [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) | Gets object encapsulating HTTP response headers to send back |
 
-## Validation
+### Validation
 
 Obviously, developers need to *know* headers received from client and *set* headers to send back in response, but the way they link depends on your application. There are some particular cases, however, in which request and response headers (and HTTP status) are bound logically:
 
 - **[cache validation](#cache-validation)**: validating [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) headers based on [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) in order to *communicate with client browser cache* and set [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) headers in accordance to    
 - **[CORS validation](#CORS-validation)**: validating [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) headers based on [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) in order to *answer a CORS request* and set [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) headers in accordance to [CORS](https://fetch.spec.whatwg.org/#cors-protocol) protocol specifications
 
-### Cache Validation
+#### Cache Validation
 
 The purpose of cache validation is to communicate with client browser's cache based on headers and make your site display instantly whenever possible. The language of communication is identified by [RFC-7232](https://tools.ietf.org/html/rfc7232) and [RFC-7234](https://tools.ietf.org/html/rfc7234) specifications both your site (via this API) and your browser must obey.
 
-#### How Cache Validation Works
+##### How Cache Validation Works
 
 The way it works is too complex to be written here, so what follows next only covers the typical use case. HTTP standard allows you following simple method of communication based on conditional headers:
 
@@ -142,7 +142,7 @@ Above method has a disadvantage by assuming cache to be *stale*, thus requiring 
 
 The two methods of communication described above are not mutually exclusive. Mature applications use both, with different policies based on page requested: some pages can be assumed to be stale by default, others allow some freshness and finally a few may not even be compatible with caching because output changes on every request
 
-#### How Is Cache Validation Implemented
+##### How Is Cache Validation Implemented
 
 To set cache-related response headers, using following [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) methods:
 
@@ -181,18 +181,18 @@ Possible http status codes returned are:
 - [304](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/304): this means response has not modified and must come without a body
 - [412](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/412): this means a conditional header has failed, thus application should exit with an error
 
-### CORS Validation
+#### CORS Validation
 
 **[CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)** preliminary request is triggered automatically by client browser when it encounteres a situation where *preflight* is mandated by security reasons. 
 
-#### How CORS Validation Works
+##### How CORS Validation Works
 
 What triggers a preflight request falls outside the scope of this API documentation. If you want to learn more, check:
 
 - [simple requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Simple_requests), to understand how can a preflight request be avoided
 - [preflighted requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Preflighted_requests), to understand what triggers a preflight request and what happens next
 
-#### How Is CORS Validation Implemented
+##### How Is CORS Validation Implemented
 
 To set CORS-related response headers, using following [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) methods:
 
