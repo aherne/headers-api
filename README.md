@@ -14,7 +14,11 @@ Table of contents:
 
 ## About 
 
-This API encapsulates HTTP request headers received from client and response headers to send back, offering an ability to bind them for cache and CORS validation. That task can be achieved using following steps:
+This API encapsulates HTTP request headers received from client and response headers to send back, offering an ability to bind them for cache and CORS validation.
+
+![diagram](https://www.lucinda-framework.com/public/images/svg/headers-api.svg)
+
+That task can be achieved using following steps:
 
 - **[configuration](#configuration)**: setting up an XML file where cache/CORS validation policies are configured
 - **[initialization](#initialization)**: using [Lucinda\Headers\Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) to read above XML into a [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php), read HTTP request headers into a [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) then initialize [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php), encapsulating HTTP response headers logic.
