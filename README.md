@@ -224,7 +224,7 @@ Fortunately, all of this is done automatically by API once you are running *vali
 - requires developers to put origin hostname (eg: https://www.google.com) as argument. This cannot be set in XML since it may differ by development environment! If none is provided, any [Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin) is considered valid!
 - sets CORS response headers based on *allow_credentials*, *cors_max_age*, *allowed_request_headers*, *allowed_response_headers*  XML attributes encapsulated by [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) and CORS request headers received
 
-## Display
+### Display
 
 Once response headers, status and body (if any) become available, you are finally able to send headers back to client. Example:
 
