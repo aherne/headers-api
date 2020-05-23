@@ -1,5 +1,19 @@
 # HTTP Headers API
 
+Table of contents:
+
+- [About](#about)
+- [Configuration](#configuration)
+- [Execution](#execution)
+    - [Initialization](#initialization)
+    - [Validation](#validation)
+    - [Display](#display)
+- [Unit Tests](#unit-tests)
+- [Examples](#unit-tests)
+- [Reference Guide](#reference-guide)
+
+## About 
+
 This API encapsulates HTTP request headers received from client and response headers to send back, offering an ability to bind them for cache and CORS validation. That task can be achieved using following steps:
 
 - **[configuration](#configuration)**: setting up an XML file where cache/CORS validation policies are configured
@@ -72,7 +86,10 @@ Example:
     <route url="login" no_cache="1" allowed_methods="GET,POST"/>    
 </routes>
 ```
-## Initialization
+
+## Execution
+
+### Initialization
 
 Now that policies have been configured, they can be bound to request and response using  [Lucinda\Headers\Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php), which creates then works with three objects:
 
@@ -89,100 +106,6 @@ Once set, [Lucinda\Headers\Policy](https://github.com/aherne/headers-api/blob/ma
 | validateCache | [Lucinda\Headers\Cacheable](https://github.com/aherne/headers-api/blob/master/src/Cacheable.php) $cacheable, string $requestMethod | int | Performs HTTP cache validation based on user-defined Cacheable representation of requested resource  |
 | validateCORS | string $origin = null | void | Performs CORS request validation based on user-defined origin (*PROTOCOL://HOSTNAME*, eg: https://www.google.com). If none provided, *Access-Control-Allow-Origin* will equal "*" (all origins supported)! |
 | getResponse | void | [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) | Gets object encapsulating HTTP response headers to send back |
-
-### Request
-
-As stated above, class [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) encapsulates HTTP request headers received from client. Each method inside (minus *__construct*) corresponds to a header:
-
-| Method | Arguments | Returns | Description | Header |
-| --- | --- | --- | --- | --- |
-| __construct | array $headers | void | Reads headers received from client | - |
-| getAccept() | void | array | Gets content types accepted by client | [Accept](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept) |
-| getAcceptCharset() | void | array | Gets charsets accepted by client| [Accept-Charset](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Charset) |
-| getAcceptEncoding() | void | array | Gets encodings accepted by client | [Accept-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding) |
-| getAcceptLanguage() | void | array | Gets languages accepted by client | [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language) |
-| getTE() | void | array | Gets transfer encodings accepted by client | [TE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/TE) |
-| getAuthorization() | void | ?[Lucinda\Headers\Request\Authorization](https://github.com/aherne/headers-api/blob/master/src/Request/Authorization.php) | Gets credentials for user authentication | [Authorization](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization) |
-| getCacheControl() | void | ?[Lucinda\Headers\Request\CacheControl](https://github.com/aherne/headers-api/blob/master/src/Request/CacheControl.php) | Gets HTTP caching settings requested by client | [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
-| getDNT() | void | bool | Gets whether or not client does not want to be tracked | [DNT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/DNT) |
-| getDate() | void | ?int | Gets UNIX timestamp of date request came with | [Date](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Date) |
-| getExpect() | void | bool | Gets whether client is about to send a large request | [Expect](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expect) |
-| getSaveData() | void | bool | ... | [Save-Data](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Save-Data) |
-| getForwardedIP() | void | ?string | Gets origin IP that got forwarded by proxy | [X-Forwarded-For](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) |
-| getForwardedProxy() | void | ?string | Gets proxy IP that forwarded client, if present | [X-Forwarded-For](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) |
-| getForwardedHost() | void | ?string | Gets origin Host that got forwarded by proxy  | [X-Forwarded-Host](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host) |
-| getForwardedProtocol() | void | ?string | Gets origin protocol that got forwarded by proxy | [X-Forwarded-Proto](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto) |
-| getFrom() | void | ?string | Gets email address of client | [From](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/From) |
-| getHost() | void | ?string | Gets hostname requested by client | [Host](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host) |
-| getIfRangeDate() | void | ?int | Gets UNIX timestamp of range condition, if present  | [If-Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range) |
-| getIfRangeEtag() | void | ?string | Gets ETag of range condition, if present | [If-Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range) |
-| getRange() | void | ?[Lucinda\Headers\Request\Range](https://github.com/aherne/headers-api/blob/master/src/Request/Range.php) | Gets bytes range requested by client from a big document | [Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range) |
-| getReferer() | void | ?string | Gets address of the previous web page from which a link to the currently requested page was followed | [Referer](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer) |
-| getUserAgent() | void | ?string | Gets signature of client browser | [User-Agent](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent) |
-| getWantDigest() | void | array | Gets details of digest client wants in response | [Want-Digest](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Want-Digest) |
-| getIfMatch() | void | ?string | Gets ETag that must condition response to be sent only if matches that of requested resource | [If-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Match) |
-| getIfNoneMatch() | void | ?string | Gets ETag that must condition response to be sent only if it does not match that of requested resource | [If-None-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match) |
-| getIfModifiedSince() | void | ?int | Gets UNIX timestamp that must condition response to be sent only if matches that of requested resource | [If-Modified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) |
-| getIfUnmodifiedSince() | void | ?int | Gets UNIX timestamp that must condition response to be sent only if it does not match that of requested resource | [If-Unmodified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Unmodified-Since) |
-| getAccessControlRequestHeaders() | void | array | Gets headers that will be requested later as part of a **CORS** preliminary request | [Access-Control-Request-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers) |
-| getAccessControlRequestMethod() | void | ?string | Gets HTTP method that will be used later as part of a **CORS** preliminary request | [Access-Control-Request-Method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method) |
-| getOrigin() | void | ?string | Gets client hostname to validate access to requested resource, sent automatically in **CORS** preliminary request | [Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin) |
-| getCustomHeaders() | void | array | Gets all non-standard headers requested by client as header name:value array | (any) |
-
-Following limitations apply:
-
-- weak or multiple ETags are not supported
-
-### Response
-
-As stated above, class [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) encapsulates HTTP response headers to send back. Each method inside (minus *toArray*) corresponds to a header:
-
-| Method | Arguments | Returns | Description | Header |
-| --- | --- | --- | --- | --- |
-| addAcceptPatch | string $mimeType, string $charset=null | void | Adds a content type for whom PATCH requests are accepted | [Accept-Patch](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Patch) |
-| setAcceptRanges | bool $value | void | Sets whether or not range requests are accepted | [Accept-Ranges](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Ranges) |
-| addAllow | string $requestMethod | void | Sets a request method server accepts for requested resource | [Allow](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Allow) |
-| addClearSiteData | string $directive = "*" | void | Sets a browsing data (cookies, storage, cache) to be cleared on client | [Clear-Site-Data](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data) |
-| setCacheControl | void | [Lucinda\Headers\Response\CacheControl](https://github.com/aherne/headers-api/blob/master/src/Response/CacheControl.php) | Sets HTTP caching settings to be used by client | [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
-| setContentDisposition | string $type | [Lucinda\Headers\Response\ContentDisposition](https://github.com/aherne/headers-api/blob/master/src/Response/ContentDisposition.php) | Sets how content will be displayed (inline or attachment) | [Content-Disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) |
-| addContentEncoding | string $contentEncoding | void | Adds an encoding applied in compressing response | [Content-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding) |
-| addContentLanguage | string $language | void | Adds a language to associate response with  | [Content-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language) |
-| setContentLength | int $length | void | Sets byte length of response | [Content-Length](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Length) |
-| setContentLocation | string $url | void | Sets alternate uri for the returned data | [Content-Location](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Location) |
-| setContentRange | string $unit = "bytes", int $start = null, int $end = null, int $size = null | void | Sets returning document range | [Content-Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Range) |
-| setContentType | string $mimeType, string $charset = null | void | Sets content type of response | [Content-Type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type) |
-| setContentTypeOptions | void | void | Indicates that content types should not be changed or followed (anti-sniffing solution) | [X-Content-Type-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options) |
-| setCrossOriginResourcePolicy | string $option | void | Sets policy to block no-cors cross-origin/cross-site requests to the given resource | [Cross-Origin-Resource-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Resource-Policy) |
-| addDigest | string $algorithm, string $value | void | Adds a digest to response | [Digest](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Digest) |
-| setEtag | string $value | void | Sets ETag to associate response to requested resource with | [ETag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) |
-| setExpirationTime | int $unixTime | void | Sets UNIX time by which response to be cached by client browser should require revalidation (**deprecated**) | [Expires](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expires) |
-| setLastModifiedTime | int $unixTime | void | Sets UNIX time requested resource was last modified, to associate response with  | [Last-Modified](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified) |
-| setLocation | string $url | void | Sets url client should redirect to. | [Location](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location) |
-| setReferrerPolicy | string $option | void | Sets much Referer information should be included with requests. | [Referrer-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy) |
-| setRentryAfterDate | int $unixTime | void | Sets UNIX time client should wait before making a follow-up request | [Rentry-After](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Rentry-After) |
-| setRentryAfterDelay | int $delay | void | Sets seconds client should wait before making a follow-up request | [Rentry-After](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Rentry-After) |
-| setSourceMap | string $url | void | Links response to a source map enabling the browser to present the reconstructed original in the debugger. | [SourceMap](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/SourceMap) |
-| setStrictTransportSecurity | bool $includeSubdomains = false, bool $preload = false | void | Informs client that current website only accepts HTTPS | [Strict-Transport-Security](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security) |
-| addTimingAllowOrigin | string $url = "*" | void | Adds an origins allowed to see values from Resource Timing API | [Timing-Allow-Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Timing-Allow-Origin) |
-| setTk | string $status | void | Sets tracking status that applied to the corresponding request | [Tk](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Tk) |
-| setTrailer | string $headerNames | void | Allows the sender to include additional fields at the end of chunked messages | [Trailer](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Trailer) |
-| addTransferEncoding | string $contentEncoding | void | Adds form of encoding used to safely transfer the payload body to the user. | [Transfer-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding) |
-| addVary | string $headerName = "*" | void | Adds a request header to decide in future whether a cached response can be used | [Vary](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary) |
-| setWWWAuthenticate | string $type, string $realm="" | [Lucinda\Headers\Response\WwwAuthenticate](https://github.com/aherne/headers-api/blob/master/src/Response/WwwAuthenticate.php) |  Defines the authentication method that should be used to gain access to a resource | [WWW-Authenticate](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/WWW-Authenticate) |
-| setDNSPrefetchControl | bool $value = true | void | Activates DNS prefetching on client | [X-DNS-Prefetch-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control) |
-| setFrameOptions | string $option | void | Indicates whether or not a browser should be allowed to render a page in a frame / iframe / embed / object | [X-Frame-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options) |
-| setAccessControlAllowCredentials | void | void | Answers to **CORS** request by signaling credentials are to be exposed | [Access-Control-Allow-Credentials](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials) |
-| addAccessControlAllowHeader | string $headerName | void | Adds allowed request header to answer a **CORS** request | [Access-Control-Allow-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers) |
-| addAccessControlAllowMethod | string $requestMethod | void | Adds allowed request method to answer a **CORS** request | [Access-Control-Allow-Methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods) |
-| setAccessControlAllowOrigin | string $origin = "*" | void | Sets allowed origin to answer a **CORS** request | [Access-Control-Allow-Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin) |
-| addAccessControlExposeHeaders | string $headerName = "*" | void | Adds response header client should expose to answer a **CORS** request | [Access-Control-Expose-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers) |
-| setAccessControlMaxAge | int $duration | void | Sets how long response to a CORS request should be cached (in seconds) | [Access-Control-Max-Age](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age) |
-| setCustomHeader | string $name, string $value | void | Sets a custom header by name and value (this **may trigger CORS requests**) | (any) |
-| toArray | void | array | Converts all headers set to a name:value array ready to be sent back to client | - |
-
-Following limitations apply:
-
-- weak or multiple ETags are not supported
 
 ## Validation
 
@@ -368,3 +291,100 @@ For tests and examples, check following files/folders in API sources:
 ## Examples
 
 To see examples how request headers are parsed by [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php), check its matching [UnitTest](https://github.com/aherne/headers-api/blob/master/tests/RequestTest.php). To see how response headers are set by [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php), check its matching [UnitTest](https://github.com/aherne/headers-api/blob/master/tests/ResponseTest.php). To see detailed examples of each headers and understand them in greatest detail, there is no better documentation than the one provided by [Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)!
+
+    
+## Reference Guide
+
+### Request
+
+Class [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) encapsulates HTTP request headers received from client. Each method inside (minus *__construct*) corresponds to a header:
+
+| Method | Arguments | Returns | Description | Header |
+| --- | --- | --- | --- | --- |
+| __construct | array $headers | void | Reads headers received from client | - |
+| getAccept() | void | array | Gets content types accepted by client | [Accept](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept) |
+| getAcceptCharset() | void | array | Gets charsets accepted by client| [Accept-Charset](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Charset) |
+| getAcceptEncoding() | void | array | Gets encodings accepted by client | [Accept-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding) |
+| getAcceptLanguage() | void | array | Gets languages accepted by client | [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language) |
+| getTE() | void | array | Gets transfer encodings accepted by client | [TE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/TE) |
+| getAuthorization() | void | ?[Lucinda\Headers\Request\Authorization](https://github.com/aherne/headers-api/blob/master/src/Request/Authorization.php) | Gets credentials for user authentication | [Authorization](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization) |
+| getCacheControl() | void | ?[Lucinda\Headers\Request\CacheControl](https://github.com/aherne/headers-api/blob/master/src/Request/CacheControl.php) | Gets HTTP caching settings requested by client | [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
+| getDNT() | void | bool | Gets whether or not client does not want to be tracked | [DNT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/DNT) |
+| getDate() | void | ?int | Gets UNIX timestamp of date request came with | [Date](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Date) |
+| getExpect() | void | bool | Gets whether client is about to send a large request | [Expect](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expect) |
+| getSaveData() | void | bool | ... | [Save-Data](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Save-Data) |
+| getForwardedIP() | void | ?string | Gets origin IP that got forwarded by proxy | [X-Forwarded-For](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) |
+| getForwardedProxy() | void | ?string | Gets proxy IP that forwarded client, if present | [X-Forwarded-For](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) |
+| getForwardedHost() | void | ?string | Gets origin Host that got forwarded by proxy  | [X-Forwarded-Host](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host) |
+| getForwardedProtocol() | void | ?string | Gets origin protocol that got forwarded by proxy | [X-Forwarded-Proto](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto) |
+| getFrom() | void | ?string | Gets email address of client | [From](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/From) |
+| getHost() | void | ?string | Gets hostname requested by client | [Host](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host) |
+| getIfRangeDate() | void | ?int | Gets UNIX timestamp of range condition, if present  | [If-Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range) |
+| getIfRangeEtag() | void | ?string | Gets ETag of range condition, if present | [If-Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range) |
+| getRange() | void | ?[Lucinda\Headers\Request\Range](https://github.com/aherne/headers-api/blob/master/src/Request/Range.php) | Gets bytes range requested by client from a big document | [Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range) |
+| getReferer() | void | ?string | Gets address of the previous web page from which a link to the currently requested page was followed | [Referer](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer) |
+| getUserAgent() | void | ?string | Gets signature of client browser | [User-Agent](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent) |
+| getWantDigest() | void | array | Gets details of digest client wants in response | [Want-Digest](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Want-Digest) |
+| getIfMatch() | void | ?string | Gets ETag that must condition response to be sent only if matches that of requested resource | [If-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Match) |
+| getIfNoneMatch() | void | ?string | Gets ETag that must condition response to be sent only if it does not match that of requested resource | [If-None-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match) |
+| getIfModifiedSince() | void | ?int | Gets UNIX timestamp that must condition response to be sent only if matches that of requested resource | [If-Modified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) |
+| getIfUnmodifiedSince() | void | ?int | Gets UNIX timestamp that must condition response to be sent only if it does not match that of requested resource | [If-Unmodified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Unmodified-Since) |
+| getAccessControlRequestHeaders() | void | array | Gets headers that will be requested later as part of a **CORS** preliminary request | [Access-Control-Request-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers) |
+| getAccessControlRequestMethod() | void | ?string | Gets HTTP method that will be used later as part of a **CORS** preliminary request | [Access-Control-Request-Method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method) |
+| getOrigin() | void | ?string | Gets client hostname to validate access to requested resource, sent automatically in **CORS** preliminary request | [Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin) |
+| getCustomHeaders() | void | array | Gets all non-standard headers requested by client as header name:value array | (any) |
+
+Following limitations apply:
+
+- weak or multiple ETags are not supported
+
+### Response
+
+Class [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) encapsulates HTTP response headers to send back. Each method inside (minus *toArray*) corresponds to a header:
+
+| Method | Arguments | Returns | Description | Header |
+| --- | --- | --- | --- | --- |
+| addAcceptPatch | string $mimeType, string $charset=null | void | Adds a content type for whom PATCH requests are accepted | [Accept-Patch](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Patch) |
+| setAcceptRanges | bool $value | void | Sets whether or not range requests are accepted | [Accept-Ranges](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Ranges) |
+| addAllow | string $requestMethod | void | Sets a request method server accepts for requested resource | [Allow](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Allow) |
+| addClearSiteData | string $directive = "*" | void | Sets a browsing data (cookies, storage, cache) to be cleared on client | [Clear-Site-Data](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data) |
+| setCacheControl | void | [Lucinda\Headers\Response\CacheControl](https://github.com/aherne/headers-api/blob/master/src/Response/CacheControl.php) | Sets HTTP caching settings to be used by client | [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
+| setContentDisposition | string $type | [Lucinda\Headers\Response\ContentDisposition](https://github.com/aherne/headers-api/blob/master/src/Response/ContentDisposition.php) | Sets how content will be displayed (inline or attachment) | [Content-Disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) |
+| addContentEncoding | string $contentEncoding | void | Adds an encoding applied in compressing response | [Content-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding) |
+| addContentLanguage | string $language | void | Adds a language to associate response with  | [Content-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language) |
+| setContentLength | int $length | void | Sets byte length of response | [Content-Length](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Length) |
+| setContentLocation | string $url | void | Sets alternate uri for the returned data | [Content-Location](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Location) |
+| setContentRange | string $unit = "bytes", int $start = null, int $end = null, int $size = null | void | Sets returning document range | [Content-Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Range) |
+| setContentType | string $mimeType, string $charset = null | void | Sets content type of response | [Content-Type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type) |
+| setContentTypeOptions | void | void | Indicates that content types should not be changed or followed (anti-sniffing solution) | [X-Content-Type-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options) |
+| setCrossOriginResourcePolicy | string $option | void | Sets policy to block no-cors cross-origin/cross-site requests to the given resource | [Cross-Origin-Resource-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Resource-Policy) |
+| addDigest | string $algorithm, string $value | void | Adds a digest to response | [Digest](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Digest) |
+| setEtag | string $value | void | Sets ETag to associate response to requested resource with | [ETag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) |
+| setExpirationTime | int $unixTime | void | Sets UNIX time by which response to be cached by client browser should require revalidation (**deprecated**) | [Expires](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expires) |
+| setLastModifiedTime | int $unixTime | void | Sets UNIX time requested resource was last modified, to associate response with  | [Last-Modified](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified) |
+| setLocation | string $url | void | Sets url client should redirect to. | [Location](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location) |
+| setReferrerPolicy | string $option | void | Sets much Referer information should be included with requests. | [Referrer-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy) |
+| setRentryAfterDate | int $unixTime | void | Sets UNIX time client should wait before making a follow-up request | [Rentry-After](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Rentry-After) |
+| setRentryAfterDelay | int $delay | void | Sets seconds client should wait before making a follow-up request | [Rentry-After](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Rentry-After) |
+| setSourceMap | string $url | void | Links response to a source map enabling the browser to present the reconstructed original in the debugger. | [SourceMap](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/SourceMap) |
+| setStrictTransportSecurity | bool $includeSubdomains = false, bool $preload = false | void | Informs client that current website only accepts HTTPS | [Strict-Transport-Security](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security) |
+| addTimingAllowOrigin | string $url = "*" | void | Adds an origins allowed to see values from Resource Timing API | [Timing-Allow-Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Timing-Allow-Origin) |
+| setTk | string $status | void | Sets tracking status that applied to the corresponding request | [Tk](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Tk) |
+| setTrailer | string $headerNames | void | Allows the sender to include additional fields at the end of chunked messages | [Trailer](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Trailer) |
+| addTransferEncoding | string $contentEncoding | void | Adds form of encoding used to safely transfer the payload body to the user. | [Transfer-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding) |
+| addVary | string $headerName = "*" | void | Adds a request header to decide in future whether a cached response can be used | [Vary](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary) |
+| setWWWAuthenticate | string $type, string $realm="" | [Lucinda\Headers\Response\WwwAuthenticate](https://github.com/aherne/headers-api/blob/master/src/Response/WwwAuthenticate.php) |  Defines the authentication method that should be used to gain access to a resource | [WWW-Authenticate](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/WWW-Authenticate) |
+| setDNSPrefetchControl | bool $value = true | void | Activates DNS prefetching on client | [X-DNS-Prefetch-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control) |
+| setFrameOptions | string $option | void | Indicates whether or not a browser should be allowed to render a page in a frame / iframe / embed / object | [X-Frame-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options) |
+| setAccessControlAllowCredentials | void | void | Answers to **CORS** request by signaling credentials are to be exposed | [Access-Control-Allow-Credentials](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials) |
+| addAccessControlAllowHeader | string $headerName | void | Adds allowed request header to answer a **CORS** request | [Access-Control-Allow-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers) |
+| addAccessControlAllowMethod | string $requestMethod | void | Adds allowed request method to answer a **CORS** request | [Access-Control-Allow-Methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods) |
+| setAccessControlAllowOrigin | string $origin = "*" | void | Sets allowed origin to answer a **CORS** request | [Access-Control-Allow-Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin) |
+| addAccessControlExposeHeaders | string $headerName = "*" | void | Adds response header client should expose to answer a **CORS** request | [Access-Control-Expose-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers) |
+| setAccessControlMaxAge | int $duration | void | Sets how long response to a CORS request should be cached (in seconds) | [Access-Control-Max-Age](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age) |
+| setCustomHeader | string $name, string $value | void | Sets a custom header by name and value (this **may trigger CORS requests**) | (any) |
+| toArray | void | array | Converts all headers set to a name:value array ready to be sent back to client | - |
+
+Following limitations apply:
+
+- weak or multiple ETags are not supported
