@@ -7,6 +7,8 @@ Table of contents:
 - [Execution](#execution)
     - [Initialization](#initialization)
     - [Validation](#validation)
+        - [Cache Validation](#cache-validation)
+        - [CORS Validation](#cors-validation)
     - [Display](#display)
 - [Unit Tests](#unit-tests)
 - [Examples](#unit-tests)
