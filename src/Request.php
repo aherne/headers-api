@@ -191,9 +191,8 @@ class Request
      */
     private function _validateEtag(string $headerValue): string
     {
-        $etag = trim(str_replace('"', '', $headerValue));
-        $etag = str_replace(array("-gzip","-gunzip"), "", $etag); // hardcoding: remove gzip & gunzip added to each etag by apache2
-        if (!$etag || stripos($etag, "w/") !== false || stripos($etag, ",") !== false) {
+        $etag = trim(str_ireplace(array("-gzip", "-gunzip", "w/", "\""), "", $headerValue));
+        if (!$etag || stripos($etag, ",") !== false) {
             return null;
         }
         return $etag;
