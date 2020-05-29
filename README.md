@@ -342,7 +342,7 @@ Class [Lucinda\Headers\Request](https://github.com/aherne/headers-api/blob/maste
 
 Following limitations apply:
 
-- weak or multiple ETags are not supported
+- multiple ETags are not supported
 
 ### Response
 
@@ -393,4 +393,4 @@ Class [Lucinda\Headers\Response](https://github.com/aherne/headers-api/blob/mast
 
 Following limitations apply:
 
-- weak or multiple ETags are not supported
+- multiple ETags are not supported
