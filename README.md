@@ -18,7 +18,7 @@ Table of contents:
 
 This API encapsulates HTTP request headers received from client and response headers to send back, offering an ability to bind them for cache and CORS validation.
 
-![diagram](https://www.lucinda-framework.com/public/images/svg/headers-api.svg)
+![diagram](https://www.lucinda-framework.com/headers-api.svg)
 
 That task can be achieved using following steps:
 
