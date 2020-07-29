@@ -100,7 +100,7 @@ class CacheValidator
                 return 304;
             } else { // if modified before TIME
                 // error situation (header date should NEVER be newer than source date) to answer with 200 OK, in order to force cache refresh
-                return 200;
+                return 412;
             }
         }
         
