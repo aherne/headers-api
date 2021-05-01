@@ -12,7 +12,7 @@ class PolicyLocatorTest
 <xml>
     <headers allowed_request_headers="X-Custom-Header, Upgrade-Insecure-Requests"/>
     <routes>
-        <route url="login" allowed_methods="GET,POST"/>
+        <route id="login" allowed_methods="GET,POST"/>
     </routes>
 </xml>
 '), "login");

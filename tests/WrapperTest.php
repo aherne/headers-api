@@ -14,8 +14,8 @@ class WrapperTest
 <xml>
     <headers cache_expiration="10" allow_credentials="1" cors_max_age="5" allowed_request_headers="X-Custom-Header, Upgrade-Insecure-Requests" allowed_response_headers="Content-Length, X-Kuma-Revision"/>
     <routes>
-        <route url="index" allowed_methods="GET,POST"/>
-        <route url="login" no_cache="1"/>
+        <route id="index" allowed_methods="GET,POST"/>
+        <route id="login" no_cache="1"/>
     </routes>
 </xml>
 ');

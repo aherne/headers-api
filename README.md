@@ -71,7 +71,7 @@ Minimal syntax of this tag is:
 
 ```xml
 <routes>
-    <route url="..." no_cache="..." cache_expiration="..." allowed_methods="..."/>
+    <route id="..." no_cache="..." cache_expiration="..." allowed_methods="..."/>
     ...
 </routes>
 ```
@@ -80,7 +80,7 @@ Where:
 
 - **routes**: (mandatory) holds list of site routes, each identified by a **route** tag
     - **route**: (mandatory) holds policies about a specific route
-        - *url*: (mandatory) page relative url (eg: administration)
+        - *id*: (mandatory) page relative url (eg: administration)
         - *no_cache*: (optional) disables HTTP caching for respective route (can be 0 or 1; 0 is default)
         - *cache_expiration*: (optional) duration in seconds respective route responses in site will be cached without revalidation (must be a positive number)
         - *allowed_methods*: (optional) list of HTTP request methods supported by respective route. If none are provided and a CORS *Access-Control-Request-Method* is requested, that method is assumed as supported!
@@ -88,8 +88,8 @@ Example:
 
 ```xml
 <routes>
-    <route url="index" no_cache="0" cache_expiration="10" allowed_methods="GET"/>
-    <route url="login" no_cache="1" allowed_methods="GET,POST"/>    
+    <route id="index" no_cache="0" cache_expiration="10" allowed_methods="GET"/>
+    <route id="login" no_cache="1" allowed_methods="GET,POST"/>    
 </routes>
 ```
 

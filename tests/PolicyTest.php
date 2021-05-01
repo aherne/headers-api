@@ -17,7 +17,7 @@ class PolicyTest
         <headers no_cache="1" cache_expiration="10" allow_credentials="1" cors_max_age="5" allowed_request_headers="X-Custom-Header, Upgrade-Insecure-Requests" allowed_response_headers="Content-Length, X-Kuma-Revision"/>
         ');
         $this->xml_routes = \simplexml_load_string('
-        <route url="index" allowed_methods="GET,POST"/>
+        <route id="index" allowed_methods="GET,POST"/>
         ');
     }
 

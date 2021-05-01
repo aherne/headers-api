@@ -43,7 +43,7 @@ class PolicyLocator
         $this->policy->setCredentialsAllowed($parent);
         
         // use route-specific policy, if found
-        $info = $xml->xpath("//routes/route[@url='".$requestedPage."']");
+        $info = $xml->xpath("//routes/route[@id='".$requestedPage."']");
         if (!empty($info)) {
             $child = $info[0];
             $this->policy->setCachingDisabled($child);
