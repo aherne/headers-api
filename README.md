@@ -98,7 +98,7 @@ Example:
 
 ## Binding Points
 
-In order to remain flexible and achieve highest performance, API takes no more assumptions than those absolutely required! It offers developers instead an ability to bind programmatically to its prototypes via <u>validateCache</u> method of [Wrapper](#initialization):
+In order to remain flexible and achieve highest performance, API takes no more assumptions than those absolutely required! It offers developers instead an ability to bind programmatically to its prototypes via <ins>validateCache</ins> method of [Wrapper](#initialization):
 
 | Class Prototype | Ability Gained |
 | --- | --- |
@@ -177,7 +177,7 @@ To read cache-related request headers, using following [Request](#class-request)
 | [If-Modified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) | getIfModifiedSince |
 | [If-Unmodified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Unmodified-Since) | getIfUnmodifiedSince |
 
-Fortunately, all of this is done automatically by API once you are running <u>validateCache</u> method of [Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) object. This method:
+Fortunately, all of this is done automatically by API once you are running <ins>validateCache</ins> method of [Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) object. This method:
 
 - configures [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) response header based on namesake request header and XML settings encapsulated by [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php)
 - sets [ETag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) response header based on [Cacheable](#interface-cacheable) representation of requested resource, if exists
@@ -228,7 +228,7 @@ To read CORS-related request headers, using following [Request](#class-request) 
 | [Access-Control-Request-Method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method) | getAccessControlRequestMethod |
 | [Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin) | getOrigin |
 
-Fortunately, all of this is done automatically by API once you are running <u>validateCORS</u> method of [Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) object. This method:
+Fortunately, all of this is done automatically by API once you are running <ins>validateCORS</ins> method of [Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) object. This method:
 
 - requires developers to put origin hostname (eg: https://www.google.com) as argument. This cannot be set in XML since it may differ by development environment! If none is provided, any [Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin) is considered valid!
 - sets CORS response headers based on *allow_credentials*, *cors_max_age*, *allowed_request_headers*, *allowed_response_headers*  XML attributes encapsulated by [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) and CORS request headers received
