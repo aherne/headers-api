@@ -343,7 +343,7 @@ class Response
     public function addTimingAllowOrigin(string $url = "*"): void
     {
         if ($url!="*" && !filter_var($url, FILTER_VALIDATE_URL)) {
-            throw new UserException("Invalid value for header: Source-Map");
+            throw new UserException("Invalid value for header: Timing-Allow-Origin");
         }
         $this->timingAllowOrigin[] = $url;
     }
@@ -492,7 +492,7 @@ class Response
     public function setAccessControlAllowOrigin(string $origin = "*"): void
     {
         if ($origin!="*" && !filter_var($origin, FILTER_VALIDATE_URL)) {
-            throw new UserException("Invalid value for header: Source-Map");
+            throw new UserException("Invalid value for header: Access-Control-Allow-Origin");
         }
         $this->allowOrigin = $origin;
     }
