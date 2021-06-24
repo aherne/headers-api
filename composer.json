@@ -14,7 +14,8 @@
     },
     "autoload": {
     	"psr-4": {
-        	"Lucinda\\Headers\\": "src/"
+        	"Lucinda\\Headers\\": "src/",
+                "Test\\Lucinda\\Headers\\": "tests/"
     	}
     },
     "authors": [
