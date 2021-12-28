@@ -6,16 +6,16 @@
     "homepage": "https://github.com/aherne/headers-api",
     "license": "MIT",
     "require": {
-        "php": "^7.1",
+        "php": "^8.1",
         "ext-SimpleXML": "*"
     },
     "require-dev": {
-        "lucinda/unit-testing": "^1.0"
+        "lucinda/unit-testing": "^2.0"
     },
     "autoload": {
     	"psr-4": {
         	"Lucinda\\Headers\\": "src/",
-                "Test\\Lucinda\\Headers\\": "tests/"
+            "Test\\Lucinda\\Headers\\": "tests/"
     	}
     },
     "authors": [

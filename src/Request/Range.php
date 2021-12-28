@@ -8,8 +8,8 @@ use Lucinda\Headers\Request\Range\Condition;
  */
 class Range
 {
-    private $unit;
-    private $conditions = [];
+    private string $unit;
+    private array $conditions = [];
     
     /**
      * Parses header value

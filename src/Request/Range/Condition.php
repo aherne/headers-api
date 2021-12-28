@@ -6,8 +6,8 @@ namespace Lucinda\Headers\Request\Range;
  */
 class Condition
 {
-    private $start;
-    private $end;
+    private ?int $start = null;
+    private ?int $end = null;
     
     /**
      * Sets up a condition based on start and end directives.

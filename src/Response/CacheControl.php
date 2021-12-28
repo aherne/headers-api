@@ -6,15 +6,15 @@ namespace Lucinda\Headers\Response;
  */
 class CacheControl
 {
-    private $public;
-    private $private;
-    private $no_cache;
-    private $no_store;
-    private $no_transform;
-    private $must_revalidate;
-    private $max_age;
-    private $proxy_revalidate;
-    private $proxy_max_age;
+    private bool $public = false;
+    private bool $private = false;
+    private bool $no_cache = false;
+    private bool $no_store = false;
+    private bool $no_transform = false;
+    private bool $must_revalidate = false;
+    private ?int $max_age = null;
+    private bool $proxy_revalidate = false;
+    private ?int $proxy_max_age = null;
     
     /**
      * Indicates that the response MAY be cached by any cache, even if it would normally be non-cacheable or cacheable only within a non- shared cache

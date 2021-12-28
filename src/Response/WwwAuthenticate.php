@@ -6,17 +6,17 @@ namespace Lucinda\Headers\Response;
  */
 class WwwAuthenticate
 {
-    private $type;
-    private $realm;
-    private $challenges = [];
-    
+    private string $type;
+    private ?string $realm = null;
+    private array $challenges = [];
+
     /**
      * Constructs header based on type (usually: basic) and va
      *
      * @param string $type
-     * @param string $realm
+     * @param ?string $realm
      */
-    public function __construct(string $type, string $realm=null)
+    public function __construct(string $type, ?string $realm =null)
     {
         $this->type = $type;
         $this->realm = $realm;

@@ -6,11 +6,11 @@ namespace Lucinda\Headers\Request;
  */
 class CacheControl
 {
-    private $no_cache = false;
-    private $no_store = false;
-    private $max_age;
-    private $max_stale;
-    private $min_fresh;
+    private bool $no_cache = false;
+    private bool $no_store = false;
+    private ?int $max_age = null;
+    private ?int $max_stale = null;
+    private ?int $min_fresh = null;
     
     /**
      * Parses header value

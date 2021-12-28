@@ -11,37 +11,37 @@ use Lucinda\Headers\Request\CacheControl;
  */
 class Request
 {
-    private $accept = [];
-    private $acceptCharset = [];
-    private $acceptEncoding = [];
-    private $acceptLanguage = [];
-    private $acceptedTransferEncodings = [];
-    private $authorization;
-    private $cacheControl;
-    private $doNotTrack = false;
-    private $date;
-    private $digestEncryptions = [];
-    private $expectContinue = false;
-    private $originalIP;
-    private $originalProxy;
-    private $originalHostName;
-    private $originalProtocol;
-    private $email;
-    private $hostName;
-    private $ifMatch;
-    private $ifModifiedSince;
-    private $ifNoneMatch;
-    private $ifUnmodifiedSince;
-    private $ifRangeDate;
-    private $ifRangeEtag;
-    private $range;
-    private $referrer;
-    private $saveData = false;
-    private $userAgent;
-    private $accessControlRequestHeaders = [];
-    private $accessControlRequestMethod;
-    private $origin;
-    private $customHeaders = [];
+    private array $accept = [];
+    private array $acceptCharset = [];
+    private array $acceptEncoding = [];
+    private array $acceptLanguage = [];
+    private array $acceptedTransferEncodings = [];
+    private ?Authorization $authorization = null;
+    private ?CacheControl $cacheControl = null;
+    private bool $doNotTrack = false;
+    private ?int $date = null;
+    private array $digestEncryptions = [];
+    private bool $expectContinue = false;
+    private ?string $originalIP = null;
+    private ?string $originalProxy = null;
+    private ?string $originalHostName = null;
+    private ?string $originalProtocol = null;
+    private ?string $email = null;
+    private ?string $hostName = null;
+    private ?string $ifMatch = null;
+    private ?int $ifModifiedSince = null;
+    private ?string $ifNoneMatch = null;
+    private ?int $ifUnmodifiedSince = null;
+    private ?int $ifRangeDate = null;
+    private ?string $ifRangeEtag = null;
+    private ?Range $range = null;
+    private ?string $referrer = null;
+    private bool $saveData = false;
+    private ?string $userAgent = null;
+    private array $accessControlRequestHeaders = [];
+    private ?string $accessControlRequestMethod = null;
+    private ?string $origin = null;
+    private array $customHeaders = [];
     
     /**
      * Reads headers received
@@ -187,37 +187,15 @@ class Request
      * Validates etag if it's strong and single.
      *
      * @param string $headerValue
-     * @return string Value of valid etag or null if etag is empty / multiple / weak.
+     * @return ?string Value of valid etag or null if etag is empty / multiple / weak.
      */
-    private function _validateEtag(string $headerValue): string
+    private function _validateEtag(string $headerValue): ?string
     {
         $etag = trim(str_ireplace(array("-gzip", "-gunzip", "w/", "\""), "", $headerValue));
         if (!$etag || stripos($etag, ",") !== false) {
             return null;
         }
         return $etag;
-    }
-    
-    /**
-     * Validates numeric header value
-     *
-     * @param string $headerValue
-     * @return integer Value of valid number or null if value is not numeric.
-     */
-    private function _validateNumber(string $headerValue): int
-    {
-        if (!is_numeric($headerValue)) {
-            return null;
-        }
-        $output = (integer) $headerValue;
-        // overflow protection
-        if ($output< 0) {
-            $output= -1;
-        }
-        if ($output> 2147483648) {
-            $output= 2147483648;
-        }
-        return $output;
     }
     
     /**

@@ -6,17 +6,17 @@ namespace Lucinda\Headers;
  */
 class Policy
 {
-    private $no_cache = false;
-    private $expires;
+    private bool $no_cache = false;
+    private ?int $expires = null;
     
-    private $allowedCredentials = false;
-    private $allowedMethods = [];
-    private $allowedRequestHeaders = [];
-    private $allowedResponseHeaders = [];
-    private $corsMaxAge;
+    private bool $allowedCredentials = false;
+    private array $allowedMethods = [];
+    private array $allowedRequestHeaders = [];
+    private array $allowedResponseHeaders = [];
+    private ?int $corsMaxAge = null;
     
     /**
-     * Sets whether or not caching is disabled based on value of "no_cache" XML attribute
+     * Sets whether caching is disabled based on value of "no_cache" XML attribute
      *
      * @param \SimpleXMLElement $xml
      */
@@ -28,7 +28,7 @@ class Policy
     }
     
     /**
-     * Checks whether or not caching is disabled
+     * Checks whether caching is disabled
      *
      * @return boolean Possible values: TRUE, FALSE
      */
@@ -52,7 +52,7 @@ class Policy
     /**
      * Gets value to set Cache-Control max-age directive
      *
-     * @return integer|null Possible values: an unsigned integer (seconds) or NULL (which means UNKNOWN)
+     * @return int|null Possible values: an unsigned integer (seconds) or NULL (which means UNKNOWN)
      */
     public function getExpirationPeriod(): ?int
     {
@@ -192,7 +192,7 @@ class Policy
     /**
      * Gets value to set Access-Control-Max-Age later on
      *
-     * @return integer|null
+     * @return int|null
      */
     public function getCorsMaxAge(): ?int
     {

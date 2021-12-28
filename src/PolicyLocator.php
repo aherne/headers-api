@@ -6,7 +6,7 @@ namespace Lucinda\Headers;
  */
 class PolicyLocator
 {
-    private $policy;
+    private Policy $policy;
 
     /**
      * Sets policy detection

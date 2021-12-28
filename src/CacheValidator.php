@@ -8,7 +8,7 @@ use Lucinda\Headers\Request\CacheControl;
  */
 class CacheValidator
 {
-    private $request;
+    private Request $request;
     
     /**
      * Constructs a cache validator.

@@ -6,9 +6,9 @@ namespace Lucinda\Headers;
  */
 class Wrapper
 {
-    private $policy;
-    private $request;
-    private $response;
+    private Policy $policy;
+    private Request $request;
+    private Response $response;
     
     /**
      * Detects headers policy from XML, encapsulates headers received from client and makes it possible to set response headers
@@ -70,11 +70,12 @@ class Wrapper
         }
         return $httpStatus;
     }
-    
+
     /**
      * Performs HTTP cache validation based on policy detected, request headers and origin uri and sets response headers accordingly
      *
-     * @param string $origin
+     * @param string|null $origin
+     * @throws UserException
      */
     public function validateCors(string $origin = null): void
     {

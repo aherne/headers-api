@@ -6,8 +6,8 @@ namespace Lucinda\Headers\Response;
  */
 class ContentDisposition
 {
-    private $type;
-    private $fileName=[];
+    private string $type;
+    private array $fileName=[];
     
     /**
      * Sets type (can be: inline, attachment)

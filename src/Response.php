@@ -12,44 +12,44 @@ use Lucinda\Headers\Response\CacheControl;
 class Response
 {
     // IGNORED: Content-Security-Policy, Content-Security-Policy-Report-Only
-    private $acceptPatch = [];
-    private $acceptRanges;
-    private $allow = [];
-    private $cacheControl;
-    private $clearSiteData = [];
-    private $contentDisposition;
-    private $contentEncoding = [];
-    private $contentLanguage = [];
-    private $contentLength;
-    private $contentLocation;
-    private $contentRange;
-    private $contentType;
-    private $crossOriginResourcePolicy;
-    private $digest = []; // <> Want-Digest
-    private $etag; // <> If-Match, If-None-Match
-    private $expires;
-    private $lastModified; // <> If-Modified-Since, If-Unmodified-Since
-    private $location;
-    private $referrerPolicy;
-    private $rentryAfter;
-    private $sourceMap;
-    private $strictTransportSecurity;
-    private $timingAllowOrigin=[];
-    private $tk; // <> DNT
-    private $trailer;
-    private $transferEncoding=[]; // <> TE
-    private $vary = [];
-    private $WWWAuthenticate; // <> Authorization
-    private $xContentTypeOptions;
-    private $xDNSPrefetchControl;
-    private $xFrameOptions;
-    private $customHeaders = [];
-    private $allowCredentials;
-    private $allowHeaders = []; // <> Access-Control-Request-Headers
-    private $allowMethods = [];
-    private $allowOrigin; // <> Origin
-    private $exposeHeaders = [];
-    private $maxAge;
+    private array $acceptPatch = [];
+    private ?string $acceptRanges = null;
+    private array $allow = [];
+    private ?CacheControl $cacheControl = null;
+    private array $clearSiteData = [];
+    private ?ContentDisposition $contentDisposition = null;
+    private array $contentEncoding = [];
+    private array $contentLanguage = [];
+    private ?int $contentLength = null;
+    private ?string $contentLocation = null;
+    private ?string $contentRange = null;
+    private ?string $contentType = null;
+    private ?string $crossOriginResourcePolicy = null;
+    private array $digest = []; // <> Want-Digest
+    private ?string $etag = null; // <> If-Match, If-None-Match
+    private ?string $expires = null;
+    private ?string $lastModified = null; // <> If-Modified-Since, If-Unmodified-Since
+    private ?string $location = null;
+    private ?string $referrerPolicy = null;
+    private string|int|null $rentryAfter = null;
+    private ?string $sourceMap = null;
+    private ?string $strictTransportSecurity = null;
+    private array $timingAllowOrigin=[];
+    private ?string $tk = null; // <> DNT
+    private ?string $trailer = null;
+    private array $transferEncoding=[]; // <> TE
+    private array $vary = [];
+    private ?WwwAuthenticate $WWWAuthenticate = null; // <> Authorization
+    private ?string $xContentTypeOptions = null;
+    private ?string $xDNSPrefetchControl = null;
+    private ?string $xFrameOptions = null;
+    private array $customHeaders = [];
+    private ?string $allowCredentials = null;
+    private array $allowHeaders = []; // <> Access-Control-Request-Headers
+    private array $allowMethods = [];
+    private ?string $allowOrigin = null; // <> Origin
+    private array $exposeHeaders = [];
+    private ?int $maxAge = null;
         
     /**
      * Sets one of values of HTTP header: Accept-Patch
@@ -71,11 +71,12 @@ class Response
     {
         $this->acceptRanges = ($value?"bytes":"none");
     }
-    
+
     /**
      * Sets one of values of HTTP header: Allow
      *
      * @param string $requestMethod
+     * @throws UserException
      */
     public function addAllow(string $requestMethod): void
     {
@@ -96,11 +97,12 @@ class Response
         $this->cacheControl = $cacheControl;
         return $cacheControl;
     }
-    
+
     /**
      * Sets value of HTTP header: Clear-Site-Data
      *
      * @param string $directive
+     * @throws UserException
      */
     public function addClearSiteData(string $directive = "*"): void
     {
@@ -109,12 +111,13 @@ class Response
         }
         $this->clearSiteData[] = $directive;
     }
-    
+
     /**
      * Delegates setting value of HTTP header: Content-Disposition
      *
      * @param string $type
      * @return ContentDisposition|null
+     * @throws UserException
      */
     public function setContentDisposition(string $type): ContentDisposition
     {
@@ -125,11 +128,12 @@ class Response
         $this->contentDisposition = $contentDisposition;
         return $contentDisposition;
     }
-    
+
     /**
      * Sets one of values of HTTP header: Content-Encoding
      *
-     * @param string $language
+     * @param string $contentEncoding
+     * @throws UserException
      */
     public function addContentEncoding(string $contentEncoding): void
     {
@@ -138,11 +142,12 @@ class Response
         }
         $this->contentEncoding[] = $contentEncoding;
     }
-    
+
     /**
      * Sets one of values of HTTP header: Content-Language
      *
      * @param string $language
+     * @throws UserException
      */
     public function addContentLanguage(string $language): void
     {
@@ -193,12 +198,13 @@ class Response
             throw new UserException("Invalid arguments for header: Content-Range");
         }
     }
-    
+
     /**
      * Sets value of HTTP header: Content-Type
      *
      * @param string $mimeType
-     * @param string $charset
+     * @param string|null $charset
+     * @throws UserException
      */
     public function setContentType(string $mimeType, string $charset = null): void
     {
@@ -207,11 +213,12 @@ class Response
         }
         $this->contentType = $mimeType.($charset?"; charset=".$charset:"");
     }
-    
+
     /**
      * Sets value of HTTP header: Cross-Origin-Resource-Policy
      *
      * @param string $option
+     * @throws UserException
      */
     public function setCrossOriginResourcePolicy(string $option): void
     {
@@ -220,12 +227,13 @@ class Response
         }
         $this->crossOriginResourcePolicy = $option;
     }
-    
+
     /**
      * Sets one of values of HTTP header: Digest
      *
      * @param string $algorithm
      * @param string $value
+     * @throws UserException
      */
     public function addDigest(string $algorithm, string $value): void
     {
@@ -264,11 +272,12 @@ class Response
     {
         $this->lastModified = gmdate("D, d M Y H:i:s T", $unixTime);
     }
-    
+
     /**
      * Sets value of HTTP header: Location
      *
      * @param string $url
+     * @throws UserException
      */
     public function setLocation(string $url): void
     {
@@ -277,11 +286,12 @@ class Response
         }
         $this->location = $url;
     }
-    
+
     /**
      * Sets value of HTTP header: Referrer-Policy
      *
      * @param string $option
+     * @throws UserException
      */
     public function setReferrerPolicy(string $option): void
     {
@@ -310,11 +320,12 @@ class Response
     {
         $this->rentryAfter = $delay;
     }
-    
+
     /**
      * Sets value of HTTP header: Source-Map
      *
      * @param string $url
+     * @throws UserException
      */
     public function setSourceMap(string $url): void
     {
@@ -334,11 +345,12 @@ class Response
     {
         $this->strictTransportSecurity = "max-age: 31536000".($includeSubdomains?"; includeSubdomains":"").($preload?"; preload":"");
     }
-    
+
     /**
      * Sets value of HTTP header: Timing-Allow-Origin
      *
      * @param string $url
+     * @throws UserException
      */
     public function addTimingAllowOrigin(string $url = "*"): void
     {
@@ -347,11 +359,12 @@ class Response
         }
         $this->timingAllowOrigin[] = $url;
     }
-    
+
     /**
      * Delegates setting value of HTTP header: Tk
      *
      * @param string $status
+     * @throws UserException
      */
     public function setTk(string $status): void
     {
@@ -370,11 +383,12 @@ class Response
     {
         $this->trailer = $headerNames;
     }
-    
+
     /**
      * Sets one of values of HTTP header: Transfer-Encoding
      *
      * @param string $contentEncoding
+     * @throws UserException
      */
     public function addTransferEncoding(string $contentEncoding): void
     {
@@ -393,13 +407,14 @@ class Response
     {
         $this->vary[] = $headerName;
     }
-    
+
     /**
      * Delegates setting value of HTTP header: WWW-Authenticate
      *
      * @param string $type
      * @param string $realm
      * @return WwwAuthenticate
+     * @throws UserException
      */
     public function setWWWAuthenticate(string $type, string $realm=""): WwwAuthenticate
     {
@@ -428,11 +443,12 @@ class Response
     {
         $this->xDNSPrefetchControl = ($value?"on":"off");
     }
-    
+
     /**
      * Sets one of values of HTTP header: X-Frame-Options
      *
      * @param string $option
+     * @throws UserException
      */
     public function setFrameOptions(string $option): void
     {
@@ -470,11 +486,12 @@ class Response
     {
         $this->allowHeaders[] = $headerName;
     }
-    
+
     /**
      * Sets value of HTTP header: Access-Control-Allow-Method
      *
      * @param string $requestMethod
+     * @throws UserException
      */
     public function addAccessControlAllowMethod(string $requestMethod): void
     {
@@ -483,11 +500,12 @@ class Response
         }
         $this->allowMethods[] = $requestMethod;
     }
-    
+
     /**
      * Sets value of HTTP header: Access-Control-Allow-Origin
      *
      * @param string $origin
+     * @throws UserException
      */
     public function setAccessControlAllowOrigin(string $origin = "*"): void
     {

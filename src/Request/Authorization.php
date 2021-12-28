@@ -6,8 +6,8 @@ namespace Lucinda\Headers\Request;
  */
 class Authorization
 {
-    private $type;
-    private $credentials;
+    private string $type;
+    private string $credentials;
     
     /**
      * Parses header value
