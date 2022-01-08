@@ -6,7 +6,7 @@
     "homepage": "https://github.com/aherne/headers-api",
     "license": "MIT",
     "require": {
-        "php": "^7.1",
+        "php": "^7.1|^8.0",
         "ext-SimpleXML": "*"
     },
     "require-dev": {
