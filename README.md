@@ -25,7 +25,7 @@ That task can be achieved using following steps:
 
 - **[configuration](#configuration)**: setting up an XML file where cache/CORS validation policies are configured
 - **[binding points](#binding-points)**: binding user-defined components defined in XML/code to API prototypes in order to gain necessary abilities
-- **[initialization](#initialization)**: using [Wrapper](https://github.com/aherne/headers-api/blob/v2.0/src/Wrapper.php) to read above XML into a [Policy](https://github.com/aherne/headers-api/blob/v2.0/src/Policy.php), read HTTP request headers into a [Request](#class-request) then initialize [Response](#class-response), encapsulating HTTP response headers logic.
+- **[initialization](#initialization)**: using [Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) to read above XML into a [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php), read HTTP request headers into a [Request](#class-request) then initialize [Response](#class-response), encapsulating HTTP response headers logic.
 - **[validation](#validation)**: using above to perform cache/CORS validation and set [Response](#class-response) accordingly
 - **[display](#display)**: sending back response to caller using [Response](#class-response) headers compiled above (or set individually by user)
 
@@ -108,13 +108,13 @@ In order to remain flexible and achieve highest performance, API takes no more a
 
 ### Initialization
 
-Now that policies have been configured, they can be bound to request and response using  [Wrapper](https://github.com/aherne/headers-api/blob/v2.0/src/Wrapper.php), which creates then works with three objects:
+Now that policies have been configured, they can be bound to request and response using  [Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php), which creates then works with three objects:
 
-- [Policy](https://github.com/aherne/headers-api/blob/v2.0/src/Policy.php): encapsulates validation policies detected from XML
+- [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php): encapsulates validation policies detected from XML
 - [Request](#class-request): encapsulates HTTP request headers received from client in accordance to [RFC-7231](https://tools.ietf.org/html/rfc7231) specification
 - [Response](#class-response): encapsulates HTTP response headers to send back to client in accordance to [RFC-7231](https://tools.ietf.org/html/rfc7231) specification
 
-Once set, [Policy](https://github.com/aherne/headers-api/blob/v2.0/src/Policy.php) and [Request](#class-request) become immutable (since *the past cannot be changed*). [Policy](https://github.com/aherne/headers-api/blob/v2.0/src/Policy.php) will only be used internally while [Request](#class-request) will only expose getters. [Response](#class-response), on the other hand, is only instanced while setting remains in developer's responsibility. This is because there is no default linking between request and response headers, unless you are performing **[validation](#validation)**. In light of above, public methods defined by [Wrapper](https://github.com/aherne/headers-api/blob/v2.0/src/Wrapper.php) are:
+Once set, [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) and [Request](#class-request) become immutable (since *the past cannot be changed*). [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) will only be used internally while [Request](#class-request) will only expose getters. [Response](#class-response), on the other hand, is only instanced while setting remains in developer's responsibility. This is because there is no default linking between request and response headers, unless you are performing **[validation](#validation)**. In light of above, public methods defined by [Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) are:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
@@ -126,8 +126,8 @@ Once set, [Policy](https://github.com/aherne/headers-api/blob/v2.0/src/Policy.ph
 
 Obviously, developers need to *know* headers received from client and *set* headers to send back in response, but the way they link depends on your application. There are some particular cases, however, in which request and response headers (and HTTP status) are bound logically:
 
-- **[cache validation](#cache-validation)**: validating [Request](#class-request) headers based on [Policy](https://github.com/aherne/headers-api/blob/v2.0/src/Policy.php) in order to *communicate with client browser cache* and set [Response](#class-response) headers in accordance to    
-- **[CORS validation](#CORS-validation)**: validating [Request](#class-request) headers based on [Policy](https://github.com/aherne/headers-api/blob/v2.0/src/Policy.php) in order to *answer a CORS request* and set [Response](#class-response) headers in accordance to [CORS](https://fetch.spec.whatwg.org/#cors-protocol) protocol specifications
+- **[cache validation](#cache-validation)**: validating [Request](#class-request) headers based on [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) in order to *communicate with client browser cache* and set [Response](#class-response) headers in accordance to    
+- **[CORS validation](#CORS-validation)**: validating [Request](#class-request) headers based on [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) in order to *answer a CORS request* and set [Response](#class-response) headers in accordance to [CORS](https://fetch.spec.whatwg.org/#cors-protocol) protocol specifications
 
 ### Cache Validation
 
@@ -177,9 +177,9 @@ To read cache-related request headers, using following [Request](#class-request)
 | [If-Modified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) | getIfModifiedSince |
 | [If-Unmodified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Unmodified-Since) | getIfUnmodifiedSince |
 
-Fortunately, all of this is done automatically by API once you are running <ins>validateCache</ins> method of [Wrapper](https://github.com/aherne/headers-api/blob/v2.0/src/Wrapper.php) object. This method:
+Fortunately, all of this is done automatically by API once you are running <ins>validateCache</ins> method of [Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) object. This method:
 
-- configures [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) response header based on namesake request header and XML settings encapsulated by [Policy](https://github.com/aherne/headers-api/blob/v2.0/src/Policy.php)
+- configures [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) response header based on namesake request header and XML settings encapsulated by [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php)
 - sets [ETag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) response header based on [Cacheable](#interface-cacheable) representation of requested resource, if exists
 - sets [Last-Modified](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified) response header based on [Cacheable](#interface-cacheable) representation of requested resource, if exists
 - reads cache-related request headers, matches them with [Cacheable](#interface-cacheable) representations and returns [HTTP status code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) according to RFC specifications
@@ -228,10 +228,10 @@ To read CORS-related request headers, using following [Request](#class-request) 
 | [Access-Control-Request-Method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method) | getAccessControlRequestMethod |
 | [Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin) | getOrigin |
 
-Fortunately, all of this is done automatically by API once you are running <ins>validateCORS</ins> method of [Wrapper](https://github.com/aherne/headers-api/blob/v2.0/src/Wrapper.php) object. This method:
+Fortunately, all of this is done automatically by API once you are running <ins>validateCORS</ins> method of [Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) object. This method:
 
 - requires developers to put origin hostname (eg: https://www.google.com) as argument. This cannot be set in XML since it may differ by development environment! If none is provided, any [Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin) is considered valid!
-- sets CORS response headers based on *allow_credentials*, *cors_max_age*, *allowed_request_headers*, *allowed_response_headers*  XML attributes encapsulated by [Policy](https://github.com/aherne/headers-api/blob/v2.0/src/Policy.php) and CORS request headers received
+- sets CORS response headers based on *allow_credentials*, *cors_max_age*, *allowed_request_headers*, *allowed_response_headers*  XML attributes encapsulated by [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) and CORS request headers received
 
 ### Display
 
@@ -298,19 +298,19 @@ RewriteRule ^(.*)$ index.php
 
 For tests and examples, check following files/folders in API sources:
 
-- [test.php](https://github.com/aherne/headers-api/blob/v2.0/test.php): runs unit tests in console
-- [unit-tests.xml](https://github.com/aherne/headers-api/blob/v2.0/unit-tests.xml): sets up unit tests and mocks "loggers" tag
-- [tests](https://github.com/aherne/headers-api/blob/v2.0/tests): unit tests for classes from [src](https://github.com/aherne/headers-api/blob/v2.0/src) folder
+- [test.php](https://github.com/aherne/headers-api/blob/master/test.php): runs unit tests in console
+- [unit-tests.xml](https://github.com/aherne/headers-api/blob/master/unit-tests.xml): sets up unit tests and mocks "loggers" tag
+- [tests](https://github.com/aherne/headers-api/blob/master/tests): unit tests for classes from [src](https://github.com/aherne/headers-api/blob/master/src) folder
 
 ## Examples
 
-To see examples how request headers are parsed by [Request](#class-request), check its matching [UnitTest](https://github.com/aherne/headers-api/blob/v2.0/tests/RequestTest.php). To see how response headers are set by [Response](#class-response), check its matching [UnitTest](https://github.com/aherne/headers-api/blob/v2.0/tests/ResponseTest.php). To see detailed examples of each headers and understand them in greatest detail, there is no better documentation than the one provided by [Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)!
+To see examples how request headers are parsed by [Request](#class-request), check its matching [UnitTest](https://github.com/aherne/headers-api/blob/master/tests/RequestTest.php). To see how response headers are set by [Response](#class-response), check its matching [UnitTest](https://github.com/aherne/headers-api/blob/master/tests/ResponseTest.php). To see detailed examples of each headers and understand them in greatest detail, there is no better documentation than the one provided by [Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)!
     
 ## Reference Guide
 
 ### Class Request
 
-Class [Request](https://github.com/aherne/headers-api/blob/v2.0/src/Request.php) encapsulates HTTP request headers received from client. Each method inside (minus *__construct*) corresponds to a header:
+Class [Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) encapsulates HTTP request headers received from client. Each method inside (minus *__construct*) corresponds to a header:
 
 | Method | Arguments | Returns | Description | Header |
 | --- | --- | --- | --- | --- |
@@ -320,8 +320,8 @@ Class [Request](https://github.com/aherne/headers-api/blob/v2.0/src/Request.php)
 | getAcceptEncoding() | void | array | Gets encodings accepted by client | [Accept-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding) |
 | getAcceptLanguage() | void | array | Gets languages accepted by client | [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language) |
 | getTE() | void | array | Gets transfer encodings accepted by client | [TE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/TE) |
-| getAuthorization() | void | ?[Request\Authorization](https://github.com/aherne/headers-api/blob/v2.0/src/Request/Authorization.php) | Gets credentials for user authentication | [Authorization](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization) |
-| getCacheControl() | void | ?[Request\CacheControl](https://github.com/aherne/headers-api/blob/v2.0/src/Request/CacheControl.php) | Gets HTTP caching settings requested by client | [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
+| getAuthorization() | void | ?[Request\Authorization](https://github.com/aherne/headers-api/blob/master/src/Request/Authorization.php) | Gets credentials for user authentication | [Authorization](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization) |
+| getCacheControl() | void | ?[Request\CacheControl](https://github.com/aherne/headers-api/blob/master/src/Request/CacheControl.php) | Gets HTTP caching settings requested by client | [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
 | getDNT() | void | bool | Gets whether or not client does not want to be tracked | [DNT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/DNT) |
 | getDate() | void | ?int | Gets UNIX timestamp of date request came with | [Date](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Date) |
 | getExpect() | void | bool | Gets whether client is about to send a large request | [Expect](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expect) |
@@ -334,7 +334,7 @@ Class [Request](https://github.com/aherne/headers-api/blob/v2.0/src/Request.php)
 | getHost() | void | ?string | Gets hostname requested by client | [Host](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host) |
 | getIfRangeDate() | void | ?int | Gets UNIX timestamp of range condition, if present  | [If-Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range) |
 | getIfRangeEtag() | void | ?string | Gets ETag of range condition, if present | [If-Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range) |
-| getRange() | void | ?[Request\Range](https://github.com/aherne/headers-api/blob/v2.0/src/Request/Range.php) | Gets bytes range requested by client from a big document | [Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range) |
+| getRange() | void | ?[Request\Range](https://github.com/aherne/headers-api/blob/master/src/Request/Range.php) | Gets bytes range requested by client from a big document | [Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range) |
 | getReferer() | void | ?string | Gets address of the previous web page from which a link to the currently requested page was followed | [Referer](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer) |
 | getUserAgent() | void | ?string | Gets signature of client browser | [User-Agent](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent) |
 | getWantDigest() | void | array | Gets details of digest client wants in response | [Want-Digest](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Want-Digest) |
@@ -353,7 +353,7 @@ Following limitations apply:
 
 ### Class Response
 
-Class [Response](https://github.com/aherne/headers-api/blob/v2.0/src/Response.php) encapsulates HTTP response headers to send back. Each method inside (minus *toArray*) corresponds to a header:
+Class [Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) encapsulates HTTP response headers to send back. Each method inside (minus *toArray*) corresponds to a header:
 
 | Method | Arguments | Returns | Description | Header |
 | --- | --- | --- | --- | --- |
@@ -361,8 +361,8 @@ Class [Response](https://github.com/aherne/headers-api/blob/v2.0/src/Response.ph
 | setAcceptRanges | bool $value | void | Sets whether or not range requests are accepted | [Accept-Ranges](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Ranges) |
 | addAllow | string $requestMethod | void | Sets a request method server accepts for requested resource | [Allow](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Allow) |
 | addClearSiteData | string $directive = "*" | void | Sets a browsing data (cookies, storage, cache) to be cleared on client | [Clear-Site-Data](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data) |
-| setCacheControl | void | [Response\CacheControl](https://github.com/aherne/headers-api/blob/v2.0/src/Response/CacheControl.php) | Sets HTTP caching settings to be used by client | [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
-| setContentDisposition | string $type | [Response\ContentDisposition](https://github.com/aherne/headers-api/blob/v2.0/src/Response/ContentDisposition.php) | Sets how content will be displayed (inline or attachment) | [Content-Disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) |
+| setCacheControl | void | [Response\CacheControl](https://github.com/aherne/headers-api/blob/master/src/Response/CacheControl.php) | Sets HTTP caching settings to be used by client | [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
+| setContentDisposition | string $type | [Response\ContentDisposition](https://github.com/aherne/headers-api/blob/master/src/Response/ContentDisposition.php) | Sets how content will be displayed (inline or attachment) | [Content-Disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) |
 | addContentEncoding | string $contentEncoding | void | Adds an encoding applied in compressing response | [Content-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding) |
 | addContentLanguage | string $language | void | Adds a language to associate response with  | [Content-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language) |
 | setContentLength | int $length | void | Sets byte length of response | [Content-Length](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Length) |
@@ -386,7 +386,7 @@ Class [Response](https://github.com/aherne/headers-api/blob/v2.0/src/Response.ph
 | setTrailer | string $headerNames | void | Allows the sender to include additional fields at the end of chunked messages | [Trailer](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Trailer) |
 | addTransferEncoding | string $contentEncoding | void | Adds form of encoding used to safely transfer the payload body to the user. | [Transfer-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding) |
 | addVary | string $headerName = "*" | void | Adds a request header to decide in future whether a cached response can be used | [Vary](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary) |
-| setWWWAuthenticate | string $type, string $realm="" | [Response\WwwAuthenticate](https://github.com/aherne/headers-api/blob/v2.0/src/Response/WwwAuthenticate.php) |  Defines the authentication method that should be used to gain access to a resource | [WWW-Authenticate](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/WWW-Authenticate) |
+| setWWWAuthenticate | string $type, string $realm="" | [Response\WwwAuthenticate](https://github.com/aherne/headers-api/blob/master/src/Response/WwwAuthenticate.php) |  Defines the authentication method that should be used to gain access to a resource | [WWW-Authenticate](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/WWW-Authenticate) |
 | setDNSPrefetchControl | bool $value = true | void | Activates DNS prefetching on client | [X-DNS-Prefetch-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control) |
 | setFrameOptions | string $option | void | Indicates whether or not a browser should be allowed to render a page in a frame / iframe / embed / object | [X-Frame-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options) |
 | setAccessControlAllowCredentials | void | void | Answers to **CORS** request by signaling credentials are to be exposed | [Access-Control-Allow-Credentials](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials) |
@@ -404,7 +404,7 @@ Following limitations apply:
 
 ### Interface Cacheable
 
-Class [Cacheable](https://github.com/aherne/headers-api/blob/v2.0/src/Cacheable.php) defines blueprints for cache validation via methods:
+Class [Cacheable](https://github.com/aherne/headers-api/blob/master/src/Cacheable.php) defines blueprints for cache validation via methods:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
