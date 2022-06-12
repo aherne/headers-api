@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\Headers\Request\Range;
 
 /**
@@ -8,7 +9,7 @@ class Condition
 {
     private ?int $start = null;
     private ?int $end = null;
-    
+
     /**
      * Sets up a condition based on start and end directives.
      *
@@ -24,7 +25,7 @@ class Condition
             $this->end = (int) $end;
         }
     }
-    
+
     /**
      * Gets value of range start
      *
@@ -34,7 +35,7 @@ class Condition
     {
         return $this->start;
     }
-    
+
     /**
      * Gets value of range end
      *

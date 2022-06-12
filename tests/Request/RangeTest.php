@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\Headers\Request;
 
 use Lucinda\Headers\Request\Range;
@@ -7,7 +8,7 @@ use Lucinda\UnitTest\Result;
 class RangeTest
 {
     private $object;
-    
+
     public function __construct()
     {
         $this->object = new Range("bytes=200-1000, 19000-");
@@ -17,7 +18,7 @@ class RangeTest
     {
         return new Result($this->object->getUnit()=="bytes");
     }
-        
+
 
     public function getConditions()
     {

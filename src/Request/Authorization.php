@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\Headers\Request;
 
 /**
@@ -8,7 +9,7 @@ class Authorization
 {
     private string $type;
     private string $credentials;
-    
+
     /**
      * Parses header value
      *
@@ -23,7 +24,7 @@ class Authorization
         $this->type = substr($value, 0, $position);
         $this->credentials = trim(substr($value, $position+1));
     }
-    
+
     /**
      * Gets authorization type (usually: basic)
      *
@@ -33,7 +34,7 @@ class Authorization
     {
         return $this->type;
     }
-    
+
     /**
      * Gets authorization credentials (usually: some token)
      *

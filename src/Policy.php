@@ -1,20 +1,33 @@
 <?php
+
 namespace Lucinda\Headers;
+
+use Lucinda\Headers\Request\Method;
 
 /**
  * Encapsulates HTTP header policies for your application
  */
 class Policy
 {
-    private bool $no_cache = false;
+    private bool $noCache = false;
     private ?int $expires = null;
-    
+
     private bool $allowedCredentials = false;
+
+    /**
+     * @var string[]
+     */
     private array $allowedMethods = [];
+    /**
+     * @var string[]
+     */
     private array $allowedRequestHeaders = [];
+    /**
+     * @var string[]
+     */
     private array $allowedResponseHeaders = [];
     private ?int $corsMaxAge = null;
-    
+
     /**
      * Sets whether caching is disabled based on value of "no_cache" XML attribute
      *
@@ -23,10 +36,10 @@ class Policy
     public function setCachingDisabled(\SimpleXMLElement $xml): void
     {
         if ($xml["no_cache"]!==null) {
-            $this->no_cache = ((string) $xml["no_cache"]?true:false);
+            $this->noCache = (bool)((string)$xml["no_cache"]);
         }
     }
-    
+
     /**
      * Checks whether caching is disabled
      *
@@ -34,9 +47,9 @@ class Policy
      */
     public function getCachingDisabled(): bool
     {
-        return $this->no_cache;
+        return $this->noCache;
     }
-    
+
     /**
      * Sets value to set Cache-Control max-age directive based on value of "cache_expiration" XML attribute
      *
@@ -45,10 +58,10 @@ class Policy
     public function setExpirationPeriod(\SimpleXMLElement $xml): void
     {
         if ($xml["cache_expiration"]!==null) {
-            $this->expires = (integer) $xml["cache_expiration"];
+            $this->expires = (int) $xml["cache_expiration"];
         }
     }
-    
+
     /**
      * Gets value to set Cache-Control max-age directive
      *
@@ -58,29 +71,30 @@ class Policy
     {
         return $this->expires;
     }
-    
+
     /**
-     * Sets whether or not CORS Access-Control-Allow-Credentials should be activated based on value of "allow_credentials" XML attribute
+     * Sets whether or not CORS Access-Control-Allow-Credentials should be activated based on value of
+     * "allow_credentials" XML attribute
      *
      * @param \SimpleXMLElement $xml
      */
     public function setCredentialsAllowed(\SimpleXMLElement $xml): void
     {
         if ($xml["allow_credentials"]!==null) {
-            $this->allowedCredentials = ((string) $xml["allow_credentials"]?1:0);
+            $this->allowedCredentials = (bool)((string)$xml["allow_credentials"]);
         }
     }
-    
+
     /**
-     * Gets whether or not CORS Access-Control-Allow-Credentials should be activated
+     * Gets whether CORS Access-Control-Allow-Credentials should be activated
      *
-     * @return boolean Possible values: TRUE, FALSE
+     * @return bool Possible values: TRUE, FALSE
      */
     public function getCredentialsAllowed(): bool
     {
         return $this->allowedCredentials;
     }
-    
+
     /**
      * Sets value to set CORS Access-Control-Allow-Methods based on value of "allowed_methods" XML attribute
      *
@@ -96,23 +110,23 @@ class Policy
             }
             foreach ($matches[0] as $value) {
                 $value = trim($value);
-                if (in_array($value, ["GET","HEAD","POST","PUT","DELETE","CONNECT","OPTIONS","TRACE","PATCH"])) {
+                if (Method::tryFrom($value)) {
                     $this->allowedMethods[] = $value;
                 }
             }
         }
     }
-    
+
     /**
      * Gets values to set CORS Access-Control-Allow-Methods
      *
-     * @return array
+     * @return string[]
      */
     public function getAllowedMethods(): array
     {
         return $this->allowedMethods;
     }
-    
+
     /**
      * Sets value to set CORS Access-Control-Allow-Headers based on value of "allowed_request_headers" XML attribute
      *
@@ -134,17 +148,17 @@ class Policy
             }
         }
     }
-    
+
     /**
      * Gets values to set CORS Access-Control-Allow-Headers
      *
-     * @return array
+     * @return string[]
      */
     public function getAllowedRequestHeaders(): array
     {
         return $this->allowedRequestHeaders;
     }
-    
+
     /**
      * Sets value to set CORS Access-Control-Expose-Headers based on value of "allowed_response_headers" XML attribute
      *
@@ -166,17 +180,17 @@ class Policy
             }
         }
     }
-    
+
     /**
      * Gets values to set CORS Access-Control-Expose-Headers
      *
-     * @return array
+     * @return string[]
      */
     public function getAllowedResponseHeaders(): array
     {
         return $this->allowedResponseHeaders;
     }
-    
+
     /**
      * Sets value to set Access-Control-Max-Age later on based on value of "cors_max_age" XML attribute
      *
@@ -185,10 +199,10 @@ class Policy
     public function setCorsMaxAge(\SimpleXMLElement $xml): void
     {
         if ($xml["cors_max_age"]!==null) {
-            $this->corsMaxAge = (integer) $xml["cors_max_age"];
+            $this->corsMaxAge = (int) $xml["cors_max_age"];
         }
     }
-    
+
     /**
      * Gets value to set Access-Control-Max-Age later on
      *

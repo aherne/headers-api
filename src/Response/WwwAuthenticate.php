@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\Headers\Response;
 
 /**
@@ -8,12 +9,15 @@ class WwwAuthenticate
 {
     private string $type;
     private ?string $realm = null;
+    /**
+     * @var array<string,string>
+     */
     private array $challenges = [];
 
     /**
      * Constructs header based on type (usually: basic) and va
      *
-     * @param string $type
+     * @param string  $type
      * @param ?string $realm
      */
     public function __construct(string $type, ?string $realm =null)
@@ -21,7 +25,7 @@ class WwwAuthenticate
         $this->type = $type;
         $this->realm = $realm;
     }
-    
+
     /**
      * Adds a challenge (setting) to header (eg: Charset->UTF8)
      *
@@ -32,7 +36,7 @@ class WwwAuthenticate
     {
         $this->challenges[$key] = $value;
     }
-        
+
     /**
      * Gets string representation of header value
      *
@@ -40,7 +44,7 @@ class WwwAuthenticate
      */
     public function toString(): string
     {
-        $response = $this->type.($this->realm?" realm=\"".$this->realm."\"":"");
+        $response = $this->type.($this->realm ? " realm=\"".$this->realm."\"" : "");
         foreach ($this->challenges as $key=>$value) {
             $response .= ", ".$key."=\"".$value."\"";
         }

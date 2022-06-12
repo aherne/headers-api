@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\Headers;
 
 use Lucinda\Headers\Response;
@@ -13,7 +14,7 @@ class ResponseTest
         $response->addAcceptPatch("text/example", "utf-8");
         return new Result($response->toArray()==["Accept-Patch"=>"application/example, text/example;charset=utf-8"]);
     }
-        
+
 
     public function setAcceptRanges()
     {
@@ -21,7 +22,7 @@ class ResponseTest
         $response->setAcceptRanges(true);
         return new Result($response->toArray()==["Accept-Ranges"=>"bytes"]);
     }
-        
+
 
     public function addAllow()
     {
@@ -30,7 +31,7 @@ class ResponseTest
         $response->addAllow("POST");
         return new Result($response->toArray()==["Allow"=>"GET, POST"]);
     }
-        
+
 
     public function setCacheControl()
     {
@@ -40,7 +41,7 @@ class ResponseTest
         $cacheControl->setMaxAge(10);
         return new Result($response->toArray()==["Cache-Control"=>"public, max-age=10"]);
     }
-        
+
 
     public function addClearSiteData()
     {
@@ -49,7 +50,7 @@ class ResponseTest
         $response->addClearSiteData("cookies");
         return new Result($response->toArray()==["Clear-Site-Data"=>'"cache", "cookies"']);
     }
-        
+
 
     public function setContentDisposition()
     {
@@ -57,7 +58,7 @@ class ResponseTest
         $response->setContentDisposition("attachment")->setFileName("test.jpg", true);
         return new Result($response->toArray()==["Content-Disposition"=>'attachment; filename*="test.jpg"']);
     }
-        
+
 
     public function addContentEncoding()
     {
@@ -66,7 +67,7 @@ class ResponseTest
         $response->addContentEncoding("compress");
         return new Result($response->toArray()==["Content-Encoding"=>'gzip, compress']);
     }
-        
+
 
     public function addContentLanguage()
     {
@@ -75,7 +76,7 @@ class ResponseTest
         $response->addContentLanguage("de");
         return new Result($response->toArray()==["Content-Language"=>'en-US, de']);
     }
-        
+
 
     public function setContentLength()
     {
@@ -83,7 +84,7 @@ class ResponseTest
         $response->setContentLength(20);
         return new Result($response->toArray()==["Content-Length"=>'20']);
     }
-        
+
 
     public function setContentLocation()
     {
@@ -91,7 +92,7 @@ class ResponseTest
         $response->setContentLocation("https://www.google.com");
         return new Result($response->toArray()==["Content-Location"=>'https://www.google.com']);
     }
-        
+
 
     public function setContentRange()
     {
@@ -105,7 +106,7 @@ class ResponseTest
         $results[] = new Result($response->toArray()==["Content-Range"=>'bytes 100-200/500'], "all arguments given");
         return $results;
     }
-        
+
 
     public function setContentType()
     {
@@ -113,7 +114,7 @@ class ResponseTest
         $response->setContentType("text/html", "UTF-8");
         return new Result($response->toArray()==["Content-Type"=>'text/html; charset=UTF-8']);
     }
-        
+
 
     public function setCrossOriginResourcePolicy()
     {
@@ -121,7 +122,7 @@ class ResponseTest
         $response->setCrossOriginResourcePolicy("same-site");
         return new Result($response->toArray()==["Cross-Origin-Resource-Policy"=>'same-site']);
     }
-        
+
 
     public function addDigest()
     {
@@ -130,7 +131,7 @@ class ResponseTest
         $response->addDigest("UNIXsum", "30637");
         return new Result($response->toArray()==["Digest"=>'SHA-256=X48E9qOokqqrvdts8nOJRJN3OWDUoyWxBf7kbu9DBPE=, UNIXsum=30637']);
     }
-        
+
 
     public function setEtag()
     {
@@ -138,7 +139,7 @@ class ResponseTest
         $response->setEtag("abc");
         return new Result($response->toArray()==["ETag"=>'"abc"']);
     }
-        
+
 
     public function setExpirationTime()
     {
@@ -146,7 +147,7 @@ class ResponseTest
         $response->setExpirationTime(time()+10);
         return new Result($response->toArray()==["Expires"=>gmdate("D, d M Y H:i:s T", time()+10)]);
     }
-        
+
 
     public function setLastModifiedTime()
     {
@@ -154,7 +155,7 @@ class ResponseTest
         $response->setLastModifiedTime(time()-10);
         return new Result($response->toArray()==["Last-Modified"=>gmdate("D, d M Y H:i:s T", time()-10)]);
     }
-        
+
 
     public function setLocation()
     {
@@ -162,7 +163,7 @@ class ResponseTest
         $response->setLocation("https://www.google.com");
         return new Result($response->toArray()==["Location"=>'https://www.google.com']);
     }
-        
+
 
     public function setReferrerPolicy()
     {
@@ -170,7 +171,7 @@ class ResponseTest
         $response->setReferrerPolicy("no-referrer");
         return new Result($response->toArray()==["Referrer-Policy"=>'no-referrer']);
     }
-        
+
 
     public function setRentryAfterDate()
     {
@@ -178,7 +179,7 @@ class ResponseTest
         $response->setRentryAfterDate(time()+10);
         return new Result($response->toArray()==["Rentry-After"=>gmdate("D, d M Y H:i:s T", time()+10)]);
     }
-        
+
 
     public function setRentryAfterDelay()
     {
@@ -186,7 +187,7 @@ class ResponseTest
         $response->setRentryAfterDelay(10);
         return new Result($response->toArray()==["Rentry-After"=>'10']);
     }
-        
+
 
     public function setSourceMap()
     {
@@ -194,15 +195,15 @@ class ResponseTest
         $response->setSourceMap("https://www.google.com");
         return new Result($response->toArray()==["Source-Map"=>'https://www.google.com']);
     }
-        
+
 
     public function setStrictTransportSecurity()
     {
         $response = new Response();
         $response->setStrictTransportSecurity();
-        return new Result($response->toArray()==["Strict-Transport-Security"=>'max-age: 31536000']);
+        return new Result($response->toArray()==["Strict-Transport-Security"=>'max-age: '.Response\StrictTransportSecurity::MAX_AGE]);
     }
-        
+
 
     public function addTimingAllowOrigin()
     {
@@ -210,7 +211,7 @@ class ResponseTest
         $response->addTimingAllowOrigin("https://www.google.com");
         return new Result($response->toArray()==["Timing-Allow-Origin"=>'https://www.google.com']);
     }
-        
+
 
     public function setTk()
     {
@@ -218,12 +219,13 @@ class ResponseTest
         $response->setTk("G");
         return new Result($response->toArray()==["Tk"=>'G']);
     }
-        
+
 
     public function setTrailer()
     {
         $response = new Response();
-        $response->setTrailer('Expires
+        $response->setTrailer(
+            'Expires
 
 7\r\n 
 Mozilla\r\n 
@@ -233,8 +235,10 @@ Developer\r\n
 Network\r\n 
 0\r\n 
 Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
-\r\n');
-        return new Result($response->toArray()==["Trailer"=>'Expires
+\r\n'
+        );
+        return new Result(
+            $response->toArray()==["Trailer"=>'Expires
 
 7\r\n 
 Mozilla\r\n 
@@ -244,9 +248,10 @@ Developer\r\n
 Network\r\n 
 0\r\n 
 Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
-\r\n']);
+\r\n']
+        );
     }
-        
+
 
     public function addTransferEncoding()
     {
@@ -255,7 +260,7 @@ Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
         $response->addTransferEncoding("identity");
         return new Result($response->toArray()==["Transfer-Encoding"=>'gzip, identity']);
     }
-        
+
 
     public function addVary()
     {
@@ -264,7 +269,7 @@ Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
         $response->addVary("Content-Type");
         return new Result($response->toArray()==["Vary"=>'User-Agent, Content-Type']);
     }
-        
+
 
     public function setWWWAuthenticate()
     {
@@ -272,7 +277,7 @@ Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
         $response->setWWWAuthenticate("Bearer", "lucinda");
         return new Result($response->toArray()==["WWW-Authenticate"=>'Bearer realm="lucinda"']);
     }
-        
+
 
     public function setContentTypeOptions()
     {
@@ -280,7 +285,7 @@ Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
         $response->setContentTypeOptions();
         return new Result($response->toArray()==["X-Content-Type-Options"=>'nosniff']);
     }
-        
+
 
     public function setDNSPrefetchControl()
     {
@@ -288,7 +293,7 @@ Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
         $response->setDNSPrefetchControl(true);
         return new Result($response->toArray()==["X-DNS-Prefetch-Control"=>'on']);
     }
-        
+
 
     public function setFrameOptions()
     {
@@ -296,7 +301,7 @@ Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
         $response->setFrameOptions("deny");
         return new Result($response->toArray()==["X-Frame-Options"=>'deny']);
     }
-        
+
 
     public function setCustomHeader()
     {
@@ -304,7 +309,7 @@ Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
         $response->setCustomHeader("Test", "me");
         return new Result($response->toArray()==["Test"=>'me']);
     }
-        
+
 
     public function setAccessControlAllowCredentials()
     {
@@ -312,7 +317,7 @@ Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
         $response->setAccessControlAllowCredentials();
         return new Result($response->toArray()==["Access-Control-Allow-Credentials"=>'true']);
     }
-        
+
 
     public function addAccessControlAllowHeader()
     {
@@ -321,7 +326,7 @@ Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
         $response->addAccessControlAllowHeader("Upgrade-Insecure-Requests");
         return new Result($response->toArray()==["Access-Control-Allow-Headers"=>'X-Custom-Header, Upgrade-Insecure-Requests']);
     }
-        
+
 
     public function addAccessControlAllowMethod()
     {
@@ -330,7 +335,7 @@ Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
         $response->addAccessControlAllowMethod("POST");
         return new Result($response->toArray()==["Access-Control-Allow-Methods"=>'GET, POST']);
     }
-        
+
 
     public function setAccessControlAllowOrigin()
     {
@@ -338,16 +343,16 @@ Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
         $response->setAccessControlAllowOrigin("https://www.google.com");
         return new Result($response->toArray()==["Access-Control-Allow-Origin"=>'https://www.google.com']);
     }
-        
 
-    public function addAccessControlExposeHeaders()
+
+    public function addAccessControlExposeHeader()
     {
         $response = new Response();
-        $response->addAccessControlExposeHeaders("X-Custom-Header");
-        $response->addAccessControlExposeHeaders("Upgrade-Insecure-Requests");
+        $response->addAccessControlExposeHeader("X-Custom-Header");
+        $response->addAccessControlExposeHeader("Upgrade-Insecure-Requests");
         return new Result($response->toArray()==["Access-Control-Expose-Headers"=>'X-Custom-Header, Upgrade-Insecure-Requests']);
     }
-        
+
 
     public function setAccessControlMaxAge()
     {
@@ -355,12 +360,12 @@ Expires: Wed, 21 Oct 2015 07:28:00 GMT\r\n
         $response->setAccessControlMaxAge(10);
         return new Result($response->toArray()==["Access-Control-Max-Age"=>'10']);
     }
-        
+
 
     public function toArray()
     {
         $response = new Response();
-        $response->addAccessControlExposeHeaders("X-Custom-Header");
+        $response->addAccessControlExposeHeader("X-Custom-Header");
         $response->setAccessControlMaxAge(10);
         return new Result($response->toArray()==["Access-Control-Expose-Headers"=>'X-Custom-Header',"Access-Control-Max-Age"=>'10']);
     }

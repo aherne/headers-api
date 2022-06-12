@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\Headers;
 
 /**
@@ -12,7 +13,7 @@ interface Cacheable
      * @return string
      */
     public function getEtag(): string;
-    
+
     /**
      * Gets last modified time that applies to resource.
      *

@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\Headers\Request\Range;
 
 use Lucinda\Headers\Request\Range\Condition;
@@ -7,7 +8,7 @@ use Lucinda\UnitTest\Result;
 class ConditionTest
 {
     private $object;
-    
+
     public function __construct()
     {
         $this->object = new Condition("1", "2");
@@ -17,7 +18,7 @@ class ConditionTest
     {
         return new Result($this->object->getStart()==1);
     }
-        
+
 
     public function getEnd()
     {

@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\Headers\Request;
 
 use Lucinda\Headers\Request\Range\Condition;
@@ -9,8 +10,11 @@ use Lucinda\Headers\Request\Range\Condition;
 class Range
 {
     private string $unit;
+    /**
+     * @var Condition[]
+     */
     private array $conditions = [];
-    
+
     /**
      * Parses header value
      *
@@ -23,14 +27,14 @@ class Range
             return;
         }
         $this->unit = substr($value, 0, $position);
-        
+
         $matches = [];
         preg_match_all("/(([0-9]+)?\-([0-9]+)?)/", substr($value, $position+1), $matches);
         foreach ($matches[0] as $i=>$value) {
             $this->conditions[]=new Condition($matches[2][$i], $matches[3][$i]);
         }
     }
-    
+
     /**
      * Gets range unit (usually: bytes)
      *
@@ -40,7 +44,7 @@ class Range
     {
         return $this->unit;
     }
-    
+
     /**
      * Gets range conditions
      *

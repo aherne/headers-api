@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\Headers\Response;
 
 /**
@@ -7,8 +8,11 @@ namespace Lucinda\Headers\Response;
 class ContentDisposition
 {
     private string $type;
+    /**
+     * @var array<string, string|bool>
+     */
     private array $fileName=[];
-    
+
     /**
      * Sets type (can be: inline, attachment)
      *
@@ -23,14 +27,14 @@ class ContentDisposition
      * Sets attachment file name (in which case type MUST be: attachment)
      *
      * @param string $fileName
-     * @param bool $isEncoded
+     * @param bool   $isEncoded
      */
     public function setFileName(string $fileName, bool $isEncoded=false): void
     {
         $this->fileName = ["name"=>$fileName, "encoded"=>$isEncoded];
     }
-    
-    
+
+
     /**
      * Gets string representation of header value
      *
@@ -38,6 +42,10 @@ class ContentDisposition
      */
     public function toString(): string
     {
-        return $this->type.($this->fileName?"; ".($this->fileName["encoded"]?"filename*":"filename")."=\"".$this->fileName["name"]."\"":"");
+        $output = $this->type;
+        if ($this->fileName) {
+            $output .= "; ".($this->fileName["encoded"] ? "filename*" : "filename")."=\"".$this->fileName["name"]."\"";
+        }
+        return $output;
     }
 }

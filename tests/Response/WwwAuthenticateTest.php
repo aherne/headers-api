@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\Headers\Response;
 
 use Lucinda\Headers\Response\WwwAuthenticate;
@@ -12,7 +13,7 @@ class WwwAuthenticateTest
         $object->addChallenge("a", "b");
         return new Result($object->toString()=='Basic realm="my realm", a="b"');
     }
-        
+
 
     public function toString()
     {

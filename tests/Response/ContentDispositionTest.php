@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\Headers\Response;
 
 use Lucinda\Headers\Response\ContentDisposition;
@@ -12,7 +13,7 @@ class ContentDispositionTest
         $object->setFileName("abc.jpg");
         return new Result($object->toString()=='attachment; filename="abc.jpg"');
     }
-        
+
 
     public function toString()
     {

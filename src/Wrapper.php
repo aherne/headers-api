@@ -1,35 +1,38 @@
 <?php
+
 namespace Lucinda\Headers;
 
 /**
- * Binds XML to request received from client in order to be able to perform cache or CORS validation later on and set response headers accordingly
+ * Binds XML to request received from client in order to be able to perform cache or CORS validation later on and
+ * set response headers accordingly
  */
 class Wrapper
 {
     private Policy $policy;
     private Request $request;
     private Response $response;
-    
+
     /**
-     * Detects headers policy from XML, encapsulates headers received from client and makes it possible to set response headers
+     * Detects headers policy from XML, encapsulates headers received from client and makes it possible to
+     * set response headers
      *
-     * @param \SimpleXMLElement $xml
-     * @param string $requestedPage
-     * @param array $requestHeaders
+     * @param \SimpleXMLElement    $xml
+     * @param string               $requestedPage
+     * @param array<string,string> $requestHeaders
      */
     public function __construct(\SimpleXMLElement $xml, string $requestedPage, array $requestHeaders)
     {
         // detects header policies from XML
         $cpl = new PolicyLocator($xml, $requestedPage);
         $this->policy = $cpl->getPolicy();
-        
+
         // set request object based on headers received from client
         $this->request = new Request($requestHeaders);
-        
+
         // sets response object encapsulating headers to send back to client
         $this->response = new Response();
     }
-    
+
     /**
      * Gets encapsulated HTTP request headers received from client
      *
@@ -39,12 +42,13 @@ class Wrapper
     {
         return $this->request;
     }
-    
+
     /**
-     * Performs HTTP cache validation based on policy detected, request headers and http method, sets response headers accordingly and returns response HTTP status
+     * Performs HTTP cache validation based on policy detected, request headers and http method, sets response
+     * headers accordingly and returns response HTTP status
      *
-     * @param Cacheable $cacheable
-     * @param string $requestMethod
+     * @param  Cacheable $cacheable
+     * @param  string    $requestMethod
      * @return int
      */
     public function validateCache(Cacheable $cacheable, string $requestMethod): int
@@ -54,7 +58,7 @@ class Wrapper
             // performs cache validation
             $validator = new CacheValidator($this->request);
             $httpStatus = $validator->validate($cacheable, $requestMethod);
-            
+
             // updates response headers
             $cacheControl = $this->response->setCacheControl();
             $cacheControl->setPublic(); // fix against session usage
@@ -72,49 +76,50 @@ class Wrapper
     }
 
     /**
-     * Performs HTTP cache validation based on policy detected, request headers and origin uri and sets response headers accordingly
+     * Performs HTTP CORS validation based on policy detected, request headers and origin uri and sets
+     * response headers accordingly
      *
-     * @param string|null $origin
+     * @param  string|null $origin
      * @throws UserException
      */
     public function validateCors(string $origin = null): void
     {
-        if ($this->request->getOrigin()) {
-            $this->response->setAccessControlAllowOrigin($origin?$origin:"*");
-            if ($this->policy->getCredentialsAllowed()) {
-                $this->response->setAccessControlAllowCredentials();
-            }
+        $validator = new CorsValidator($this->request, $this->policy, $origin);
+
+        if ($allowedOrigin = $validator->getAllowedOrigin()) {
+            $this->response->setAccessControlAllowOrigin($allowedOrigin);
         }
-        if ($requestMethod = $this->request->getAccessControlRequestMethod()) {
-            $methods = $this->policy->getAllowedMethods();
-            if (!empty($methods)) {
-                foreach ($methods as $method) {
-                    $this->response->addAccessControlAllowMethod($method);
-                }
-            } else {
-                $this->response->addAccessControlAllowMethod($requestMethod);
-            }
+
+        if ($maxAge = $validator->getMaxAge()) {
+            $this->response->setAccessControlMaxAge($maxAge);
         }
-        if ($this->request->getAccessControlRequestHeaders()) {
-            $headers = $this->policy->getAllowedRequestHeaders();
-            if (!empty($headers)) {
-                foreach ($headers as $header) {
-                    $this->response->addAccessControlAllowHeader($header);
-                }
-            } else {
-                $this->response->addAccessControlAllowHeader("*");
-            }
+
+        if ($validator->isAllowCredentials()) {
+            $this->response->setAccessControlAllowCredentials();
         }
-        if ($headers = $this->policy->getAllowedResponseHeaders()) {
-            foreach ($headers as $header) {
-                $this->response->addAccessControlExposeHeaders($header);
-            }
-        }
-        if ($duration = $this->policy->getCorsMaxAge()) {
-            $this->response->setAccessControlMaxAge($duration);
-        }
+
+        array_map(
+            function ($value) {
+                $this->response->addAccessControlAllowMethod($value);
+            },
+            $validator->getAllowedMethods()
+        );
+
+        array_map(
+            function ($value) {
+                $this->response->addAccessControlAllowHeader($value);
+            },
+            $validator->getAllowedHeaders()
+        );
+
+        array_map(
+            function ($value) {
+                $this->response->addAccessControlExposeHeader($value);
+            },
+            $validator->getExposedHeaders()
+        );
     }
-    
+
     /**
      * Gets encapsulated HTTP response headers to send back
      *

@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\Headers\Response;
 
 /**
@@ -8,16 +9,17 @@ class CacheControl
 {
     private bool $public = false;
     private bool $private = false;
-    private bool $no_cache = false;
-    private bool $no_store = false;
-    private bool $no_transform = false;
-    private bool $must_revalidate = false;
-    private ?int $max_age = null;
-    private bool $proxy_revalidate = false;
-    private ?int $proxy_max_age = null;
-    
+    private bool $noCache = false;
+    private bool $noStore = false;
+    private bool $noTransform = false;
+    private bool $mustRevalidate = false;
+    private ?int $maxAge = null;
+    private bool $proxyRevalidate = false;
+    private ?int $proxyMaxAge = null;
+
     /**
-     * Indicates that the response MAY be cached by any cache, even if it would normally be non-cacheable or cacheable only within a non- shared cache
+     * Indicates that the response MAY be cached by any cache, even if it would normally be non-cacheable or
+     * cacheable only within a non- shared cache
      */
     public function setPublic(): void
     {
@@ -26,9 +28,10 @@ class CacheControl
         }
         $this->public = true;
     }
-    
+
     /**
-     * Indicates that all or part of the response message is intended for a single user and MUST NOT be cached by a shared cache.
+     * Indicates that all or part of the response message is intended for a single user and MUST NOT be cached
+     * by a shared cache.
      */
     public function setPrivate(): void
     {
@@ -37,69 +40,73 @@ class CacheControl
         }
         $this->private = true;
     }
-    
+
     /**
-     * Indicates that cache MUST NOT use the response to satisfy a subsequent request without successful revalidation with the origin server.
-     * This allows an origin server to prevent caching even by caches that have been configured to return stale responses to client requests.
+     * Indicates that cache MUST NOT use the response to satisfy a subsequent request without successful
+     * revalidation with the origin server. This allows an origin server to prevent caching even by caches
+     * that have been configured to return stale responses to client requests.
      */
     public function setNoCache(): void
     {
-        $this->no_cache = true;
+        $this->noCache = true;
     }
-    
+
     /**
      * The cache should not store anything about the client request or server response (to enforce privacy).
      */
     public function setNoStore(): void
     {
-        $this->no_store = true;
+        $this->noStore = true;
     }
-    
+
     /**
      * The cache must verify the status of the stale resources before using it and expired ones should not be used.
      */
     public function setMustRevalidate(): void
     {
-        $this->must_revalidate = true;
+        $this->mustRevalidate = true;
     }
     /**
      * Specifies the maximum amount of time a resource will be considered fresh compared to time of request.
-     * The max-age directive on a response implies that the response is cacheable (i.e., "public") unless some other,
-     * more restrictive cache directive is also present.
+     * The max-age directive on a response implies that the response is cacheable (i.e., "public") unless
+     * some other, more restrictive cache directive is also present.
      *
      * @param integer $seconds
      */
     public function setMaxAge(int $seconds): void
     {
-        $this->max_age = $seconds;
+        $this->maxAge = $seconds;
     }
-    
+
     /**
-     * PROXY: No transformations or conversions should be made to the resource. The Content-Encoding, Content-Range, Content-Type headers must not be modified by a proxy
+     * PROXY: No transformations or conversions should be made to the resource. The Content-Encoding,
+     * Content-Range, Content-Type headers must not be modified by a proxy
      */
     public function setNoTransform(): void
     {
-        $this->no_transform = true;
+        $this->noTransform = true;
     }
-    
+
     /**
-     * PROXY: Same as must-revalidate, but it only applies to shared caches (e.g., proxies) and is ignored by a private cache.
+     * PROXY: Same as must-revalidate, but it only applies to shared caches (e.g., proxies) and is ignored by
+     * a private cache.
      */
     public function setProxyRevalidate(): void
     {
-        $this->proxy_revalidate = true;
+        $this->proxyRevalidate = true;
     }
-    
+
     /**
-     * PROXY: Overrides max-age or the expires header, but it only applies to shared caches (e.g., proxies) and is ignored by a private cache.
+     * PROXY: Overrides max-age or the expires header, but it only applies to shared caches (e.g., proxies) and
+     * is ignored by a private cache.
      *
      * @param integer $seconds
      */
     public function setProxyMaxAge(int $seconds): void
     {
-        $this->proxy_max_age = $seconds;
+        $this->proxyMaxAge = $seconds;
     }
-    
+
     /**
      * Gets string representation of header value
      *
@@ -107,34 +114,34 @@ class CacheControl
      */
     public function toString(): string
     {
-        $cache_control = array();
+        $cacheControl = [];
         if ($this->public) {
-            $cache_control[]="public";
+            $cacheControl[]="public";
         }
         if ($this->private) {
-            $cache_control[]="private";
+            $cacheControl[]="private";
         }
-        if ($this->no_cache) {
-            $cache_control[]="no-cache";
+        if ($this->noCache) {
+            $cacheControl[]="no-cache";
         }
-        if ($this->no_store) {
-            $cache_control[]="no-store";
+        if ($this->noStore) {
+            $cacheControl[]="no-store";
         }
-        if ($this->no_transform) {
-            $cache_control[]="no-transform";
+        if ($this->noTransform) {
+            $cacheControl[]="no-transform";
         }
-        if ($this->must_revalidate) {
-            $cache_control[]="must-revalidate";
+        if ($this->mustRevalidate) {
+            $cacheControl[]="must-revalidate";
         }
-        if ($this->proxy_revalidate) {
-            $cache_control[]="proxy-revalidate";
+        if ($this->proxyRevalidate) {
+            $cacheControl[]="proxy-revalidate";
         }
-        if ($this->max_age) {
-            $cache_control[]="max-age=".$this->max_age;
+        if ($this->maxAge) {
+            $cacheControl[]="max-age=".$this->maxAge;
         }
-        if ($this->proxy_max_age) {
-            $cache_control[]="s-maxage=".$this->proxy_max_age;
+        if ($this->proxyMaxAge) {
+            $cacheControl[]="s-maxage=".$this->proxyMaxAge;
         }
-        return implode(", ", $cache_control);
+        return implode(", ", $cacheControl);
     }
 }

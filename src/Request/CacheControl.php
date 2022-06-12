@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\Headers\Request;
 
 /**
@@ -6,12 +7,12 @@ namespace Lucinda\Headers\Request;
  */
 class CacheControl
 {
-    private bool $no_cache = false;
-    private bool $no_store = false;
-    private ?int $max_age = null;
-    private ?int $max_stale = null;
-    private ?int $min_fresh = null;
-    
+    private bool $noCache = false;
+    private bool $noStore = false;
+    private ?int $maxAge = null;
+    private ?int $maxStale = null;
+    private ?int $minFresh = null;
+
     /**
      * Parses header value
      *
@@ -19,38 +20,50 @@ class CacheControl
      */
     public function __construct(string $value)
     {
-        $p1 = explode(",", $value);
-        foreach ($p1 as $element) {
-            $k = "";
-            $v = "";
+        $parts = explode(",", $value);
+        foreach ($parts as $element) {
+            $key = "";
+            $value = "";
             $position = strpos($element, "=");
             if ($position) {
-                $k = trim(substr($element, 0, $position));
-                $v = trim(substr($element, $position+1));
+                $key = trim(substr($element, 0, $position));
+                $value = trim(substr($element, $position+1));
             } else {
-                $k = trim($element);
+                $key = trim($element);
             }
-            
-            switch ($k) {
-                case "no-cache":
-                    $this->no_cache = true;
-                    break;
-                case "no-store":
-                    $this->no_store = true;
-                    break;
-                case "max-age":
-                    $this->max_age = (is_numeric($v)?(int) $v:null);
-                    break;
-                case "max-stale":
-                    $this->max_stale = (is_numeric($v)?(int) $v:null);
-                    break;
-                case "min-fresh":
-                    $this->min_fresh = (is_numeric($v)?(int) $v:null);
-                    break;
-            }
+
+            $this->setDirectives($key, $value);
         }
     }
-    
+
+    /**
+     * Sets Cache-Control directives
+     *
+     * @param  string $key
+     * @param  string $value
+     * @return void
+     */
+    private function setDirectives(string $key, string $value): void
+    {
+        switch ($key) {
+        case "no-cache":
+            $this->noCache = true;
+            break;
+        case "no-store":
+            $this->noStore = true;
+            break;
+        case "max-age":
+            $this->maxAge = (is_numeric($value) ? (int) $value : null);
+            break;
+        case "max-stale":
+            $this->maxStale = (is_numeric($value) ? (int) $value : null);
+            break;
+        case "min-fresh":
+            $this->minFresh = (is_numeric($value) ? (int) $value : null);
+            break;
+        }
+    }
+
     /**
      * Checks if header came with directive: no-cache
      *
@@ -58,9 +71,9 @@ class CacheControl
      */
     public function isNoCache(): bool
     {
-        return $this->no_cache;
+        return $this->noCache;
     }
-    
+
     /**
      * Checks if header came with directive: no-store
      *
@@ -68,9 +81,9 @@ class CacheControl
      */
     public function isNoStore(): bool
     {
-        return $this->no_store;
+        return $this->noStore;
     }
-    
+
     /**
      * Gets value of directive: max-age
      *
@@ -78,9 +91,9 @@ class CacheControl
      */
     public function getMaxAge(): ?int
     {
-        return $this->max_age;
+        return $this->maxAge;
     }
-    
+
     /**
      * Gets value of directive: max-stale
      *
@@ -88,9 +101,9 @@ class CacheControl
      */
     public function getMaxStaleAge(): ?int
     {
-        return $this->max_stale;
+        return $this->maxStale;
     }
-    
+
     /**
      * Gets value of directive: min-fresh
      *
@@ -98,6 +111,6 @@ class CacheControl
      */
     public function getMinFreshAge(): ?int
     {
-        return $this->min_fresh;
+        return $this->minFresh;
     }
 }

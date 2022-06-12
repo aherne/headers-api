@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\Headers\Response;
 
 use Lucinda\UnitTest\Result;
@@ -12,7 +13,7 @@ class CacheControlTest
         $object->setPublic();
         return new Result($object->toString()=="public");
     }
-        
+
 
     public function setPrivate()
     {
@@ -20,7 +21,7 @@ class CacheControlTest
         $object->setPrivate();
         return new Result($object->toString()=="private");
     }
-        
+
 
     public function setNoCache()
     {
@@ -28,7 +29,7 @@ class CacheControlTest
         $object->setNoCache();
         return new Result($object->toString()=="no-cache");
     }
-        
+
 
     public function setNoStore()
     {
@@ -36,7 +37,7 @@ class CacheControlTest
         $object->setNoStore();
         return new Result($object->toString()=="no-store");
     }
-        
+
 
     public function setMustRevalidate()
     {
@@ -44,7 +45,7 @@ class CacheControlTest
         $object->setMustRevalidate();
         return new Result($object->toString()=="must-revalidate");
     }
-        
+
 
     public function setMaxAge()
     {
@@ -52,7 +53,7 @@ class CacheControlTest
         $object->setMaxAge(10);
         return new Result($object->toString()=="max-age=10");
     }
-        
+
 
     public function setNoTransform()
     {
@@ -60,7 +61,7 @@ class CacheControlTest
         $object->setNoTransform();
         return new Result($object->toString()=="no-transform");
     }
-        
+
 
     public function setProxyRevalidate()
     {
@@ -68,7 +69,7 @@ class CacheControlTest
         $object->setProxyRevalidate();
         return new Result($object->toString()=="proxy-revalidate");
     }
-        
+
 
     public function setProxyMaxAge()
     {
@@ -76,7 +77,7 @@ class CacheControlTest
         $object->setProxyMaxAge(10);
         return new Result($object->toString()=="s-maxage=10");
     }
-        
+
 
     public function toString()
     {
