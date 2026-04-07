@@ -99,7 +99,7 @@ class Response
      * @param string $mimeType
      * @param string $charset
      */
-    public function addAcceptPatch(string $mimeType, string $charset=null): void
+    public function addAcceptPatch(string $mimeType, ?string $charset=null): void
     {
         $this->acceptPatch[] = $mimeType.($charset ? ";charset=".$charset : "");
     }
@@ -253,11 +253,11 @@ class Response
      * Sets value of HTTP header: Content-Range
      *
      * @param string $unit
-     * @param int    $start
-     * @param int    $end
-     * @param int    $size
+     * @param ?int    $start
+     * @param ?int    $end
+     * @param ?int    $size
      */
-    public function setContentRange(string $unit = "bytes", int $start = null, int $end = null, int $size = null): void
+    public function setContentRange(string $unit = "bytes", ?int $start = null, ?int $end = null, ?int $size = null): void
     {
         if ($start && $end) {
             $this->contentRange = $unit." ".$start."-".$end."/".($size ? $size : "*");
@@ -275,7 +275,7 @@ class Response
      * @param  string|null $charset
      * @throws UserException
      */
-    public function setContentType(string $mimeType, string $charset = null): void
+    public function setContentType(string $mimeType, ?string $charset = null): void
     {
         if (preg_match("/^(application|audio|example|font|image|model|text|video)\/(.*)$/", $mimeType)!==1) {
             throw new UserException("Invalid value for header: Content-Type");

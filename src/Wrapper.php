@@ -82,7 +82,7 @@ class Wrapper
      * @param  string|null $origin
      * @throws UserException
      */
-    public function validateCors(string $origin = null): void
+    public function validateCors(?string $origin = null): void
     {
         $validator = new CorsValidator($this->request, $this->policy, $origin);
 
