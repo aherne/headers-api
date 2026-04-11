@@ -268,7 +268,6 @@ The response API includes helpers for:
 Some details worth knowing from the current source:
 
 - `Retry-After` has correctly named methods `setRetryAfterDate()` and `setRetryAfterDelay()`
-- older typoed aliases `setRentryAfterDate()` and `setRentryAfterDelay()` are still present for compatibility
 - zero-like response values such as `Retry-After: 0` and `Access-Control-Max-Age: 0` are preserved by `toArray()`
 
 ## Testing

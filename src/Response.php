@@ -52,7 +52,7 @@ class Response
     private ?string $lastModified = null; // <> If-Modified-Since, If-Unmodified-Since
     private ?string $location = null;
     private ?string $referrerPolicy = null;
-    private string|int|null $rentryAfter = null;
+    private string|int|null $retryAfter = null;
     private ?string $sourceMap = null;
     private ?StrictTransportSecurity $strictTransportSecurity = null;
     /**
@@ -409,7 +409,7 @@ class Response
      */
     public function setRetryAfterDate(int $unixTime): void
     {
-        $this->rentryAfter = gmdate("D, d M Y H:i:s T", $unixTime);
+        $this->retryAfter = gmdate("D, d M Y H:i:s T", $unixTime);
     }
 
     /**
@@ -419,27 +419,7 @@ class Response
      */
     public function setRetryAfterDelay(int $delay): void
     {
-        $this->rentryAfter = $delay;
-    }
-
-    /**
-     * Backward-compatible alias for typo kept in earlier releases.
-     *
-     * @param int $unixTime
-     */
-    public function setRentryAfterDate(int $unixTime): void
-    {
-        $this->setRetryAfterDate($unixTime);
-    }
-
-    /**
-     * Backward-compatible alias for typo kept in earlier releases.
-     *
-     * @param int $delay
-     */
-    public function setRentryAfterDelay(int $delay): void
-    {
-        $this->setRetryAfterDelay($delay);
+        $this->retryAfter = $delay;
     }
 
     /**
@@ -733,7 +713,7 @@ class Response
             'Last-Modified' => 'lastModified',
             'Location' => 'location',
             'Referrer-Policy' => 'referrerPolicy',
-            'Retry-After' => 'rentryAfter',
+            'Retry-After' => 'retryAfter',
             'Source-Map' => 'sourceMap',
             'Strict-Transport-Security' => 'strictTransportSecurity',
             'Timing-Allow-Origin' => 'timingAllowOrigin',

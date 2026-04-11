@@ -179,26 +179,10 @@ class ResponseTest
         return (new Arrays($response->toArray()))->assertEquals(["Retry-After"=>10]);
     }
 
-    public function setRentryAfterDate()
-    {
-        $time = 1700000010;
-        $response = new Response();
-        $response->setRentryAfterDate($time);
-        return (new Arrays($response->toArray()))
-            ->assertEquals(["Retry-After"=>gmdate("D, d M Y H:i:s T", $time)]);
-    }
-
-    public function setRentryAfterDelay()
+    public function setRetryAfterZeroDelay()
     {
         $response = new Response();
-        $response->setRentryAfterDelay(10);
-        return (new Arrays($response->toArray()))->assertEquals(["Retry-After"=>10]);
-    }
-
-    public function setRentryAfterZeroDelay()
-    {
-        $response = new Response();
-        $response->setRentryAfterDelay(0);
+        $response->setRetryAfterDelay(0);
         return (new Arrays($response->toArray()))->assertEquals(["Retry-After"=>0]);
     }
 
