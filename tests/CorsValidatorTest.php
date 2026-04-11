@@ -3,10 +3,12 @@
 namespace Test\Lucinda\Headers;
 
 use Lucinda\Headers\CorsValidator;
-use Lucinda\Headers\Policy;
 use Lucinda\Headers\PolicyLocator;
 use Lucinda\Headers\Request;
-use Lucinda\UnitTest\Result;
+use Lucinda\UnitTest\Validator\Arrays;
+use Lucinda\UnitTest\Validator\Booleans;
+use Lucinda\UnitTest\Validator\Integers;
+use Lucinda\UnitTest\Validator\Strings;
 
 class CorsValidatorTest
 {
@@ -17,7 +19,7 @@ class CorsValidatorTest
         $xml = \simplexml_load_string(
             '
         <xml>
-            <headers cache_expiration="10" allow_credentials="1" cors_max_age="5" allowed_request_headers="X-Custom-Header, Upgrade-Insecure-Requests" allowed_response_headers="Content-Length, X-Kuma-Revision"/>
+            <headers cache_expiration="10" allow_credentials="1" cors_max_age="5" allowed_origins="https://www.google.com" allowed_request_headers="X-Custom-Header, Upgrade-Insecure-Requests" allowed_response_headers="Content-Length, X-Kuma-Revision"/>
             <routes>
                 <route id="index" allowed_methods="GET,POST"/>
                 <route id="login" no_cache="1"/>
@@ -25,52 +27,47 @@ class CorsValidatorTest
         </xml>
         '
         );
-        $cpl = new PolicyLocator($xml, "index");
-        $policy = $cpl->getPolicy();
-
+        $policy = (new PolicyLocator($xml, "index"))->getPolicy();
         $request = new Request(
             [
-            "Origin"=>"https://www.google.com",
-            "Access-Control-Request-Method"=>"POST",
-            "Access-Control-Request-Headers"=>"X-Custom-Header, Upgrade-Insecure-Requests"
+                "Origin"=>"https://www.google.com",
+                "Access-Control-Request-Method"=>"POST",
+                "Access-Control-Request-Headers"=>"X-Custom-Header, Upgrade-Insecure-Requests"
             ]
         );
 
-        $this->validator = new CorsValidator($request, $policy, "https://www.google.com");
+        $this->validator = new CorsValidator($request, $policy, null);
     }
 
     public function getAllowedOrigin()
     {
-        return new Result($this->validator->getAllowedOrigin()=="https://www.google.com");
+        return (new Strings((string) $this->validator->getAllowedOrigin()))->assertEquals("https://www.google.com");
     }
-
 
     public function getMaxAge()
     {
-        return new Result($this->validator->getMaxAge()==5);
+        return (new Integers((int) $this->validator->getMaxAge()))->assertEquals(5);
     }
-
 
     public function isAllowCredentials()
     {
-        return new Result($this->validator->isAllowCredentials());
+        return (new Booleans($this->validator->isAllowCredentials()))->assertTrue();
     }
-
 
     public function getAllowedMethods()
     {
-        return new Result($this->validator->getAllowedMethods()==["GET","POST"]);
+        return (new Arrays($this->validator->getAllowedMethods()))->assertEquals(["GET", "POST"]);
     }
-
 
     public function getAllowedHeaders()
     {
-        return new Result($this->validator->getAllowedHeaders()==["X-Custom-Header", "Upgrade-Insecure-Requests"]);
+        return (new Arrays($this->validator->getAllowedHeaders()))
+            ->assertEquals(["X-Custom-Header", "Upgrade-Insecure-Requests"]);
     }
-
 
     public function getExposedHeaders()
     {
-        return new Result($this->validator->getExposedHeaders()==["Content-Length", "X-Kuma-Revision"]);
+        return (new Arrays($this->validator->getExposedHeaders()))
+            ->assertEquals(["Content-Length", "X-Kuma-Revision"]);
     }
 }

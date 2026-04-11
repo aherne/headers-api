@@ -3,11 +3,11 @@
 namespace Test\Lucinda\Headers\Request\Range;
 
 use Lucinda\Headers\Request\Range\Condition;
-use Lucinda\UnitTest\Result;
+use Lucinda\UnitTest\Validator\Integers;
 
 class ConditionTest
 {
-    private $object;
+    private Condition $object;
 
     public function __construct()
     {
@@ -16,12 +16,11 @@ class ConditionTest
 
     public function getStart()
     {
-        return new Result($this->object->getStart()==1);
+        return (new Integers((int) $this->object->getStart()))->assertEquals(1);
     }
-
 
     public function getEnd()
     {
-        return new Result($this->object->getEnd()==2);
+        return (new Integers((int) $this->object->getEnd()))->assertEquals(2);
     }
 }

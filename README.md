@@ -1,419 +1,298 @@
 # HTTP Headers API
 
-Table of contents:
+`lucinda/headers` is a small PHP library for:
 
-- [About](#about)
-- [Configuration](#configuration)
-- [Binding Points](#binding-points)
-- [Execution](#execution)
-    - [Initialization](#initialization)
-    - [Validation](#validation)
-        - [Cache Validation](#cache-validation)
-        - [CORS Validation](#cors-validation)
-    - [Display](#display)
-- [Unit Tests](#unit-tests)
-- [Examples](#unit-tests)
-- [Reference Guide](#reference-guide)
+- parsing request headers into a typed API
+- building response headers through validated setters
+- applying cache validation rules
+- applying CORS policy rules from XML configuration
 
-## About 
-
-This API encapsulates HTTP request headers received from client and response headers to send back, offering an ability to bind them for cache and CORS validation.
-
-![diagram](https://www.lucinda-framework.com/headers-api.svg)
-
-That task can be achieved using following steps:
-
-- **[configuration](#configuration)**: setting up an XML file where cache/CORS validation policies are configured
-- **[binding points](#binding-points)**: binding user-defined components defined in XML/code to API prototypes in order to gain necessary abilities
-- **[initialization](#initialization)**: using [Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) to read above XML into a [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php), read HTTP request headers into a [Request](#class-request) then initialize [Response](#class-response), encapsulating HTTP response headers logic.
-- **[validation](#validation)**: using above to perform cache/CORS validation and set [Response](#class-response) accordingly
-- **[display](#display)**: sending back response to caller using [Response](#class-response) headers compiled above (or set individually by user)
-
-API is fully PSR-4 compliant, only requiring PHP8.1+ interpreter and SimpleXML extension. To quickly see how it works, check:
-
-- **[installation](#installation)**: describes how to install API on your computer, in light of steps above
-- **[unit tests](#unit-tests)**: API has 100% Unit Test coverage, using [UnitTest API](https://github.com/aherne/unit-testing) instead of PHPUnit for greater flexibility
-- **[examples](#examples)**: shows a deep example of API functionality based on unit tests
-
-All classes inside belong to **Lucinda\Headers** namespace!
-
-## Configuration
-
-To configure this API you must have a XML with following tags inside:
-
-- **[headers](#headers)**: (mandatory) configures the api globally
-- **[routes](#routes)**: (optional) configures API based on route requested, required for CORS requests validation
-
-### Headers
-
-Maximal syntax of this tag is:
-
-```xml
-<headers no_cache="..." cache_expiration="..." allow_credentials="..." cors_max_age="..." allowed_request_headers="..." allowed_response_headers="..."/>
-```
-
-Where:
-
-- **headers**: (mandatory) holds global header validation policies
-    - *no_cache*: (optional) disables HTTP caching for all pages in site (can be 0 or 1; 0 is default), unless specifically activated in [route](#routes) matching page requested
-    - *cache_expiration*: (optional) duration in seconds all page responses in site will be cached without revalidation (must be a positive number)
-    - *allow_credentials*: (optional) whether or not credentials are allowed in CORS requests (can be 0 or 1; 0 is default)
-    - *cors_max_age*: (optional) duration in seconds CORS responses will be cached (must be a positive number) 
-    - *allowed_request_headers*: (~optional) list of non-standard request headers your site support separated by commas. If none are provided and a CORS *Access-Control-Request-Headers* is requested, headers listed there are assumed as supported!
-    - *allowed_response_headers*: (optional) list of response headers to expose separated by commas
-    
-Example:
-
-```xml
-<headers no_cache="1" cache_expiration="10" allow_credentials="1" cors_max_age="5" allowed_request_headers="X-Custom-Header, Upgrade-Insecure-Requests" allowed_response_headers="Content-Length, X-Kuma-Revision"/>
-```
-
-### Routes
-
-Minimal syntax of this tag is:
-
-```xml
-<routes>
-    <route id="..." no_cache="..." cache_expiration="..." allowed_methods="..."/>
-    ...
-</routes>
-```
-
-Where:
-
-- **routes**: (mandatory) holds list of site routes, each identified by a **route** tag
-    - **route**: (mandatory) holds policies about a specific route
-        - *id*: (mandatory) page relative url (eg: administration)
-        - *no_cache*: (optional) disables HTTP caching for respective route (can be 0 or 1; 0 is default)
-        - *cache_expiration*: (optional) duration in seconds respective route responses in site will be cached without revalidation (must be a positive number)
-        - *allowed_methods*: (optional) list of HTTP request methods supported by respective route. If none are provided and a CORS *Access-Control-Request-Method* is requested, that method is assumed as supported!
-Example:
-
-```xml
-<routes>
-    <route id="index" no_cache="0" cache_expiration="10" allowed_methods="GET"/>
-    <route id="login" no_cache="1" allowed_methods="GET,POST"/>    
-</routes>
-```
-
-## Binding Points
-
-In order to remain flexible and achieve highest performance, API takes no more assumptions than those absolutely required! It offers developers instead an ability to bind programmatically to its prototypes via <ins>validateCache</ins> method of [Wrapper](#initialization):
-
-| Class Prototype | Ability Gained |
-| --- | --- |
-| [Cacheable](#interface-cacheable) | (mandatory) HTTP caching by etag or unix time representations |
-
-## Execution
-
-### Initialization
-
-Now that policies have been configured, they can be bound to request and response using  [Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php), which creates then works with three objects:
-
-- [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php): encapsulates validation policies detected from XML
-- [Request](#class-request): encapsulates HTTP request headers received from client in accordance to [RFC-7231](https://tools.ietf.org/html/rfc7231) specification
-- [Response](#class-response): encapsulates HTTP response headers to send back to client in accordance to [RFC-7231](https://tools.ietf.org/html/rfc7231) specification
-
-Once set, [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) and [Request](#class-request) become immutable (since *the past cannot be changed*). [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) will only be used internally while [Request](#class-request) will only expose getters. [Response](#class-response), on the other hand, is only instanced while setting remains in developer's responsibility. This is because there is no default linking between request and response headers, unless you are performing **[validation](#validation)**. In light of above, public methods defined by [Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) are:
-
-| Method | Arguments | Returns | Description |
-| --- | --- | --- | --- |
-| __construct | \SimpleXMLElement $xml, string $requestedPage, array $requestHeaders | void | Creates Policy based on XML and requested page, sets up Request object based on request headers and initializes Response object |
-| getRequest| void | [Request](#class-request) | Gets object encapsulating HTTP request headers received |
-| validateCache | [Cacheable](#interface-cacheable) $cacheable, string $requestMethod | int | Performs HTTP cache validation based on user-defined Cacheable representation of requested resource  |
-| validateCORS | string $origin = null | void | Performs CORS request validation based on user-defined origin (*PROTOCOL://HOSTNAME*, eg: https://www.google.com). If none provided, *Access-Control-Allow-Origin* will equal "*" (all origins supported)! |
-| getResponse | void | [Response](#class-response) | Gets object encapsulating HTTP response headers to send back |
-
-Obviously, developers need to *know* headers received from client and *set* headers to send back in response, but the way they link depends on your application. There are some particular cases, however, in which request and response headers (and HTTP status) are bound logically:
-
-- **[cache validation](#cache-validation)**: validating [Request](#class-request) headers based on [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) in order to *communicate with client browser cache* and set [Response](#class-response) headers in accordance to    
-- **[CORS validation](#CORS-validation)**: validating [Request](#class-request) headers based on [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) in order to *answer a CORS request* and set [Response](#class-response) headers in accordance to [CORS](https://fetch.spec.whatwg.org/#cors-protocol) protocol specifications
-
-### Cache Validation
-
-The purpose of cache validation is to communicate with client browser's cache based on headers and make your site display instantly whenever possible. The language of communication is identified by [RFC-7232](https://tools.ietf.org/html/rfc7232) and [RFC-7234](https://tools.ietf.org/html/rfc7234) specifications both your site (via this API) and your browser must obey.
-
-#### How Cache Validation Works
-
-The way it works is too complex to be written here, so what follows next only covers the typical use case. HTTP standard allows you following simple method of communication based on conditional headers:
-
-- client-server: give me X page @ your site
-- server-client: here is my response to page X using [200 OK](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200) status header, identified uniquely by value of [ETag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) response header (or last modified at GMT date defined by value of [Last-Modified](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified) response header)
-- client: ok, I've received response and saved to my cache and link request with [ETag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) (or [Last-Modified](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified)).
-- ...(some time passes)...
-- client-server: give me X page @ your site once again. I'll also send formerly received  [ETag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag)/[Last-Modified](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified) that matched it as [If-None-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)/[If-Modified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) request headers, so that you check if page has changed or not!
-- server-client: response remained the same, so I'll save your bandwidth and only answer with a [304 Not Modified](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/304) status header and no response body
-- client: ok, so I'll display page from my browser's cache
-- ...(some time passes)...
-- client-server: give me X page @ your site once again plus same request headers
-- server-client: response has changed, so this time I'll answer with a [200 OK](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200) status header, full response body, along with the new [ETag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) (or [Last-Modified](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified)
-- client: ok, I've received response and saved to my cache and link request with the new [ETag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) (or [Last-Modified](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified)).
-
-Above method has a disadvantage by assuming cache to be *stale*, thus requiring a server roundtrip to check if requested resource has changed (*revalidation*). HTTP standard thus comes with an alternate fastest solution that uses [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) response header:
-
-- client-server: give me X page @ your site
-- server-client: here is my response to page X and assume it as *fresh* for X seconds defined by **max-age** directive of [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control)
-- client: ok, I've received response and saved to my cache. On future requests to same page, I won't ask server unless X seconds have passed and display response from cache!
-
-The two methods of communication described above are not mutually exclusive. Mature applications use both, with different policies based on page requested: some pages can be assumed to be stale by default, others allow some freshness and finally a few may not even be compatible with caching because output changes on every request
-
-#### How Is Cache Validation Implemented
-
-To set cache-related response headers, using following [Response](#class-response) methods:
-
-| Header | Method |
-| --- | --- |
-| [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) | setCacheControl |
-| [ETag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) | setEtag |
-| [Last-Modified](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified) | setLastModifiedTime |
-
-To read cache-related request headers, using following [Request](#class-request) methods:
-
-| Header | Method |
-| --- | --- |
-| [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) | getCacheControl |
-| [If-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Match) | getIfMatch |
-| [If-None-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match) | getIfNoneMatch |
-| [If-Modified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) | getIfModifiedSince |
-| [If-Unmodified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Unmodified-Since) | getIfUnmodifiedSince |
-
-Fortunately, all of this is done automatically by API once you are running <ins>validateCache</ins> method of [Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) object. This method:
-
-- configures [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) response header based on namesake request header and XML settings encapsulated by [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php)
-- sets [ETag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) response header based on [Cacheable](#interface-cacheable) representation of requested resource, if exists
-- sets [Last-Modified](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified) response header based on [Cacheable](#interface-cacheable) representation of requested resource, if exists
-- reads cache-related request headers, matches them with [Cacheable](#interface-cacheable) representations and returns [HTTP status code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) according to RFC specifications
-
-So from developers' perspective you only need to:
-
-- (optional) set up *no_cache* and *cache_expiration* XML tag attributes according to **[configuration](#configuration)** stage
-- (mandatory) implement a [Cacheable](#interface-cacheable) representation of requested resource (the way it can be converted to an etag or last time it was modified)
-- (mandatory) use http status code returned by *validateCache* when response is rendered
-
-Possible http status codes returned are:
-
-- [200](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200): this means response is ok and must come along with a body
-- [304](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/304): this means response has not modified and must come without a body
-- [412](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/412): this means a conditional header has failed, thus application should exit with an error
-
-### CORS Validation
-
-**[CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)** preliminary request is triggered automatically by client browser when it encounteres a situation where *preflight* is mandated by security reasons. 
-
-#### How CORS Validation Works
-
-What triggers a preflight request falls outside the scope of this API documentation. If you want to learn more, check:
-
-- [simple requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Simple_requests), to understand how can a preflight request be avoided
-- [preflighted requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Preflighted_requests), to understand what triggers a preflight request and what happens next
-
-#### How Is CORS Validation Implemented
-
-To set CORS-related response headers, using following [Response](#class-response) methods:
-
-| Header | Method |
-| --- | --- |
-| [Access-Control-Allow-Credentials](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials) | setAccessControlAllowCredentials |
-| [Access-Control-Allow-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers) | addAccessControlAllowHeader | 
-| [Access-Control-Allow-Methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods) | addAccessControlAllowMethod | 
-| [Access-Control-Allow-Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin) | setAccessControlAllowOrigin |
-| [Access-Control-Expose-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers) | addAccessControlExposeHeaders |
-| [Access-Control-Max-Age](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age) | setAccessControlMaxAge |
-
-To read CORS-related request headers, using following [Request](#class-request) methods:
-
-| Header | Method |
-| --- | --- |
-| [Access-Control-Request-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers) | getAccessControlRequestHeaders |
-| [Access-Control-Request-Method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method) | getAccessControlRequestMethod |
-| [Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin) | getOrigin |
-
-Fortunately, all of this is done automatically by API once you are running <ins>validateCORS</ins> method of [Wrapper](https://github.com/aherne/headers-api/blob/master/src/Wrapper.php) object. This method:
-
-- requires developers to put origin hostname (eg: https://www.google.com) as argument. This cannot be set in XML since it may differ by development environment! If none is provided, any [Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin) is considered valid!
-- sets CORS response headers based on *allow_credentials*, *cors_max_age*, *allowed_request_headers*, *allowed_response_headers*  XML attributes encapsulated by [Policy](https://github.com/aherne/headers-api/blob/master/src/Policy.php) and CORS request headers received
-
-### Display
-
-Once response headers, status and body (if any) become available, you are finally able to send headers back to client. Example:
-
-```php
-$wrapper = new Lucinda\Headers\Wrapper("configuration.xml", $_SERVER["REQUEST_URI"], getallheaders());
-// developer now reads request headers, sets response headers, compiles $responseBody then applies cache validation:
-$httpStatus = $wrapper->validateCache(new MyCacheable($responseBody), $_SERVER["REQUEST_METHOD"]);
-// now response is ready for display
-http_response_code(httpStatus);
-$headers = $wrapper->getResponse()->toArray();
-foreach ($headers as $name=>$value) {
-    header($name.": ".$value);
-}
-if ($httpStatus!=304) {
-    echo $responseBody;
-}
-```
+The package is intentionally modular. It does not try to own your controller, router, response emitter, or framework lifecycle. Instead, it gives you focused objects you can compose where headers matter.
 
 ## Installation
 
-First choose a folder, associate it to a domain then write this command there using console:
-
-```console
+```bash
 composer require lucinda/headers
 ```
 
-Then create a *configuration.xml* file holding configuration settings (see [configuration](#configuration) above) and a *index.php* file (see [initialization](#initialization) and [display](#display)) in project root with following code:
+Requirements:
+
+- PHP `^8.1`
+- `ext-SimpleXML`
+
+## What Exists Today
+
+The runtime centers around three classes:
+
+- `Lucinda\Headers\Request`: parses incoming request headers
+- `Lucinda\Headers\Response`: accumulates response headers and exports them with `toArray()`
+- `Lucinda\Headers\Wrapper`: binds XML policy, request headers, and response generation for cache/CORS workflows
+
+Supporting services and contracts:
+
+- `Lucinda\Headers\Policy`: in-memory header policy loaded from XML
+- `Lucinda\Headers\PolicyLocator`: resolves global and route-specific policy
+- `Lucinda\Headers\CacheValidator`: evaluates conditional cache headers
+- `Lucinda\Headers\CorsValidator`: evaluates CORS policy and preflight-related rules
+- `Lucinda\Headers\Cacheable`: contract for resources that can expose `ETag` and `Last-Modified` representations
+
+Exceptions:
+
+- `Lucinda\Headers\ConfigurationException`: invalid or incomplete XML policy
+- `Lucinda\Headers\UserException`: invalid response-header input supplied by application code
+
+## Integration Flow
+
+Most integrations follow this order:
+
+1. Load XML policy.
+2. Build a `Wrapper` with the requested route and raw request headers.
+3. Read parsed request headers from `Wrapper::getRequest()`.
+4. Apply cache validation and/or CORS validation.
+5. Add any extra response headers through `Wrapper::getResponse()`.
+6. Emit `Response::toArray()` using your own HTTP layer.
+
+Minimal example:
 
 ```php
-$wrapper = new Lucinda\Headers\Wrapper("configuration.xml", $_SERVER["REQUEST_URI"], getallheaders());
-// if request is CORS, response can be done immediately
-if ($_SERVER["REQUEST_METHOD"]=="OPTIONS") {
-    $wrapper->validateCORS((!empty($_SERVER['HTTPS'])?"https":"http")."://".$_SERVER["SERVER_NAME"]);
-    $headers = $wrapper->getResponse()->toArray();
-    foreach ($headers as $name=>$value) {
-        header($name.": ".$value);
-    }
-    exit();
-}
-// developer reads request headers, sets response headers, compiles $responseBody
-// developer creates a Cacheable instance (MyCacheable), able to convert $responseBody into an ETag string, then performs cache validation
-$httpStatus = $wrapper->validateCache(new MyCacheable($responseBody), $_SERVER["REQUEST_METHOD"]);
-// now response is ready for display
-http_response_code(httpStatus);
-$headers = $wrapper->getResponse()->toArray();
-foreach ($headers as $name=>$value) {
+<?php
+
+use Lucinda\Headers\Wrapper;
+
+$xml = simplexml_load_file(__DIR__."/configuration.xml");
+$wrapper = new Wrapper($xml, $_SERVER["REQUEST_URI"], getallheaders());
+
+$responseBody = "Hello world!";
+$httpStatus = $wrapper->validateCache(
+    new class($responseBody) implements \Lucinda\Headers\Cacheable {
+        public function __construct(
+            private string $body,
+            private int $time = 1700000000
+        ) {
+        }
+
+        public function getEtag(): string
+        {
+            return sha1($this->body);
+        }
+
+        public function getTime(): int
+        {
+            return $this->time;
+        }
+    },
+    $_SERVER["REQUEST_METHOD"]
+);
+
+$wrapper->validateCors();
+
+http_response_code($httpStatus);
+foreach ($wrapper->getResponse()->toArray() as $name => $value) {
     header($name.": ".$value);
 }
-if ($httpStatus!=304) {
+
+if ($httpStatus != 304) {
     echo $responseBody;
 }
 ```
 
-Then make sure domain is available to world-wide-web and all request that point to it are rerouted to index.php:
+## XML Configuration
 
+`Wrapper` expects an XML document with a mandatory `<headers>` node and an optional `<routes>` node.
+
+### Global Policy
+
+```xml
+<headers
+    no_cache="0"
+    cache_expiration="600"
+    allow_credentials="1"
+    cors_max_age="300"
+    allowed_origins="https://app.example.com, https://admin.example.com"
+    allowed_methods="GET,POST,OPTIONS"
+    allowed_request_headers="X-Custom-Header, Authorization"
+    allowed_response_headers="Content-Length, X-Revision"/>
 ```
-RewriteEngine on
-RewriteRule ^(.*)$ index.php
+
+Supported attributes on `<headers>`:
+
+- `no_cache`: disables wrapper-driven cache headers for every route
+- `cache_expiration`: response `Cache-Control: max-age=...` value
+- `allow_credentials`: enables `Access-Control-Allow-Credentials: true`
+- `cors_max_age`: response `Access-Control-Max-Age`
+- `allowed_origins`: comma-separated list of allowed CORS origins, or `*`
+- `allowed_methods`: comma-separated list of allowed CORS methods
+- `allowed_request_headers`: comma-separated request headers allowed during preflight
+- `allowed_response_headers`: comma-separated response headers exposed to browser code
+
+### Route Overrides
+
+Route nodes override the same settings on a per-route basis.
+
+```xml
+<xml>
+    <headers
+        cache_expiration="600"
+        allow_credentials="1"
+        allowed_origins="https://app.example.com"/>
+    <routes>
+        <route id="/login" no_cache="1"/>
+        <route
+            id="/admin"
+            allow_credentials="0"
+            cors_max_age="60"
+            allowed_origins="https://admin.example.com"
+            allowed_methods="PUT,DELETE"
+            allowed_request_headers="X-Admin-Header"
+            allowed_response_headers="X-Admin-Token"/>
+    </routes>
+</xml>
 ```
 
-## Unit Tests
+Notes based on current implementation:
 
-For tests and examples, check following files/folders in API sources:
+- route overrides replace the configured lists for origins, methods, request headers, and response headers
+- if no `allowed_methods` are configured, the preflight request method is echoed back
+- if no `allowed_request_headers` are configured and preflight asks for headers, `*` is used
+- if the response varies by origin, `Wrapper::validateCors()` adds `Vary: Origin`
 
-- [test.php](https://github.com/aherne/headers-api/blob/master/test.php): runs unit tests in console
-- [unit-tests.xml](https://github.com/aherne/headers-api/blob/master/unit-tests.xml): sets up unit tests and mocks "loggers" tag
-- [tests](https://github.com/aherne/headers-api/blob/master/tests): unit tests for classes from [src](https://github.com/aherne/headers-api/blob/master/src) folder
+## Cache Validation
 
-## Examples
+Cache validation is driven by:
 
-To see examples how request headers are parsed by [Request](#class-request), check its matching [UnitTest](https://github.com/aherne/headers-api/blob/master/tests/RequestTest.php). To see how response headers are set by [Response](#class-response), check its matching [UnitTest](https://github.com/aherne/headers-api/blob/master/tests/ResponseTest.php). To see detailed examples of each headers and understand them in greatest detail, there is no better documentation than the one provided by [Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)!
-    
-## Reference Guide
+- request headers parsed by `Request`
+- XML policy loaded into `Policy`
+- a user-supplied `Cacheable` implementation
 
-### Class Request
+`Cacheable` is deliberately small:
 
-Class [Request](https://github.com/aherne/headers-api/blob/master/src/Request.php) encapsulates HTTP request headers received from client. Each method inside (minus *__construct*) corresponds to a header:
+```php
+interface Cacheable
+{
+    public function getEtag(): string;
+    public function getTime(): int;
+}
+```
 
-| Method | Arguments | Returns | Description | Header |
-| --- | --- | --- | --- | --- |
-| __construct | array $headers | void | Reads headers received from client | - |
-| getAccept() | void | array | Gets content types accepted by client | [Accept](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept) |
-| getAcceptCharset() | void | array | Gets charsets accepted by client| [Accept-Charset](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Charset) |
-| getAcceptEncoding() | void | array | Gets encodings accepted by client | [Accept-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding) |
-| getAcceptLanguage() | void | array | Gets languages accepted by client | [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language) |
-| getTE() | void | array | Gets transfer encodings accepted by client | [TE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/TE) |
-| getAuthorization() | void | ?[Request\Authorization](https://github.com/aherne/headers-api/blob/master/src/Request/Authorization.php) | Gets credentials for user authentication | [Authorization](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization) |
-| getCacheControl() | void | ?[Request\CacheControl](https://github.com/aherne/headers-api/blob/master/src/Request/CacheControl.php) | Gets HTTP caching settings requested by client | [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
-| getDNT() | void | bool | Gets whether or not client does not want to be tracked | [DNT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/DNT) |
-| getDate() | void | ?int | Gets UNIX timestamp of date request came with | [Date](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Date) |
-| getExpect() | void | bool | Gets whether client is about to send a large request | [Expect](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expect) |
-| getSaveData() | void | bool | ... | [Save-Data](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Save-Data) |
-| getForwardedIP() | void | ?string | Gets origin IP that got forwarded by proxy | [X-Forwarded-For](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) |
-| getForwardedProxy() | void | ?string | Gets proxy IP that forwarded client, if present | [X-Forwarded-For](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) |
-| getForwardedHost() | void | ?string | Gets origin Host that got forwarded by proxy  | [X-Forwarded-Host](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host) |
-| getForwardedProtocol() | void | ?string | Gets origin protocol that got forwarded by proxy | [X-Forwarded-Proto](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto) |
-| getFrom() | void | ?string | Gets email address of client | [From](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/From) |
-| getHost() | void | ?string | Gets hostname requested by client | [Host](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host) |
-| getIfRangeDate() | void | ?int | Gets UNIX timestamp of range condition, if present  | [If-Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range) |
-| getIfRangeEtag() | void | ?string | Gets ETag of range condition, if present | [If-Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range) |
-| getRange() | void | ?[Request\Range](https://github.com/aherne/headers-api/blob/master/src/Request/Range.php) | Gets bytes range requested by client from a big document | [Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range) |
-| getReferer() | void | ?string | Gets address of the previous web page from which a link to the currently requested page was followed | [Referer](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer) |
-| getUserAgent() | void | ?string | Gets signature of client browser | [User-Agent](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent) |
-| getWantDigest() | void | array | Gets details of digest client wants in response | [Want-Digest](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Want-Digest) |
-| getIfMatch() | void | ?string | Gets ETag that must condition response to be sent only if matches that of requested resource | [If-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Match) |
-| getIfNoneMatch() | void | ?string | Gets ETag that must condition response to be sent only if it does not match that of requested resource | [If-None-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match) |
-| getIfModifiedSince() | void | ?int | Gets UNIX timestamp that must condition response to be sent only if matches that of requested resource | [If-Modified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) |
-| getIfUnmodifiedSince() | void | ?int | Gets UNIX timestamp that must condition response to be sent only if it does not match that of requested resource | [If-Unmodified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Unmodified-Since) |
-| getAccessControlRequestHeaders() | void | array | Gets headers that will be requested later as part of a **CORS** preliminary request | [Access-Control-Request-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers) |
-| getAccessControlRequestMethod() | void | ?string | Gets HTTP method that will be used later as part of a **CORS** preliminary request | [Access-Control-Request-Method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method) |
-| getOrigin() | void | ?string | Gets client hostname to validate access to requested resource, sent automatically in **CORS** preliminary request | [Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin) |
-| getCustomHeaders() | void | array | Gets all non-standard headers requested by client as header name:value array | (any) |
+`Wrapper::validateCache(Cacheable $cacheable, string $requestMethod): int`:
 
-Following limitations apply:
+- evaluates conditional request headers such as `If-Match`, `If-None-Match`, `If-Modified-Since`, and `If-Unmodified-Since`
+- applies cache policy from XML when caching is enabled
+- sets response headers like `Cache-Control`, `ETag`, and `Last-Modified`
+- returns an HTTP status code, typically `200`, `304`, or `412`
 
-- multiple ETags are not supported
+When `no_cache="1"` applies to the current route, wrapper-driven cache headers are skipped.
 
-### Class Response
+## CORS Validation
 
-Class [Response](https://github.com/aherne/headers-api/blob/master/src/Response.php) encapsulates HTTP response headers to send back. Each method inside (minus *toArray*) corresponds to a header:
+`Wrapper::validateCors(?string $origin = null): void` builds CORS response headers from:
 
-| Method | Arguments                                                                    | Returns                                                                                                              | Description | Header |
-| --- |------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------| --- | --- |
-| addAcceptPatch | string $mimeType, string $charset=null                                       | void                                                                                                                 | Adds a content type for whom PATCH requests are accepted | [Accept-Patch](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Patch) |
-| setAcceptRanges | bool $value                                                                  | void                                                                                                                 | Sets whether or not range requests are accepted | [Accept-Ranges](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Ranges) |
-| addAllow | string $requestMethod                                                        | void                                                                                                                 | Sets a request method server accepts for requested resource | [Allow](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Allow) |
-| addClearSiteData | string $directive = "*"                                                      | void                                                                                                                 | Sets a browsing data (cookies, storage, cache) to be cleared on client | [Clear-Site-Data](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data) |
-| setCacheControl | void                                                                         | [Response\CacheControl](https://github.com/aherne/headers-api/blob/master/src/Response/CacheControl.php)             | Sets HTTP caching settings to be used by client | [Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
-| setContentDisposition | string $type                                                                 | [Response\ContentDisposition](https://github.com/aherne/headers-api/blob/master/src/Response/ContentDisposition.php) | Sets how content will be displayed (inline or attachment) | [Content-Disposition](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) |
-| addContentEncoding | string $contentEncoding                                                      | void                                                                                                                 | Adds an encoding applied in compressing response | [Content-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding) |
-| addContentLanguage | string $language                                                             | void                                                                                                                 | Adds a language to associate response with  | [Content-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language) |
-| setContentLength | int $length                                                                  | void                                                                                                                 | Sets byte length of response | [Content-Length](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Length) |
-| setContentLocation | string $url                                                                  | void                                                                                                                 | Sets alternate uri for the returned data | [Content-Location](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Location) |
-| setContentRange | string $unit = "bytes", int $start = null, int $end = null, int $size = null | void                                                                                                                 | Sets returning document range | [Content-Range](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Range) |
-| setContentType | string $mimeType, string $charset = null                                     | void                                                                                                                 | Sets content type of response | [Content-Type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type) |
-| setContentTypeOptions | void                                                                         | void                                                                                                                 | Indicates that content types should not be changed or followed (anti-sniffing solution) | [X-Content-Type-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options) |
-| setCrossOriginResourcePolicy | string $option                                                               | void                                                                                                                 | Sets policy to block no-cors cross-origin/cross-site requests to the given resource | [Cross-Origin-Resource-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Resource-Policy) |
-| addDigest | string $algorithm, string $value                                             | void                                                                                                                 | Adds a digest to response | [Digest](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Digest) |
-| setEtag | string $value                                                                | void                                                                                                                 | Sets ETag to associate response to requested resource with | [ETag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) |
-| setExpirationTime | int $unixTime                                                                | void                                                                                                                 | Sets UNIX time by which response to be cached by client browser should require revalidation (**deprecated**) | [Expires](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expires) |
-| setLastModifiedTime | int $unixTime                                                                | void                                                                                                                 | Sets UNIX time requested resource was last modified, to associate response with  | [Last-Modified](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified) |
-| setLocation | string $url                                                                  | void                                                                                                                 | Sets url client should redirect to. | [Location](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location) |
-| setReferrerPolicy | string $option                                                               | void                                                                                                                 | Sets much Referer information should be included with requests. | [Referrer-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy) |
-| setRentryAfterDate | int $unixTime                                                                | void                                                                                                                 | Sets UNIX time client should wait before making a follow-up request | [Rentry-After](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Rentry-After) |
-| setRentryAfterDelay | int $delay                                                                   | void                                                                                                                 | Sets seconds client should wait before making a follow-up request | [Rentry-After](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Rentry-After) |
-| setSourceMap | string $url                                                                  | void                                                                                                                 | Links response to a source map enabling the browser to present the reconstructed original in the debugger. | [SourceMap](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/SourceMap) |
-| setStrictTransportSecurity | void                                                                         | [Response\StrictTransportSecurity](https://github.com/aherne/headers-api/blob/master/src/Response/StrictTransportSecurity.php)  | Informs client that current website only accepts HTTPS | [Strict-Transport-Security](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security) |
-| addTimingAllowOrigin | string $url = "*"                                                            | void                                                                                                                 | Adds an origins allowed to see values from Resource Timing API | [Timing-Allow-Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Timing-Allow-Origin) |
-| setTk | string $status                                                               | void                                                                                                                 | Sets tracking status that applied to the corresponding request | [Tk](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Tk) |
-| setTrailer | string $headerNames                                                          | void                                                                                                                 | Allows the sender to include additional fields at the end of chunked messages | [Trailer](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Trailer) |
-| addTransferEncoding | string $contentEncoding                                                      | void                                                                                                                 | Adds form of encoding used to safely transfer the payload body to the user. | [Transfer-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding) |
-| addVary | string $headerName = "*"                                                     | void                                                                                                                 | Adds a request header to decide in future whether a cached response can be used | [Vary](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary) |
-| setWWWAuthenticate | string $type, string $realm=""                                               | [Response\WwwAuthenticate](https://github.com/aherne/headers-api/blob/master/src/Response/WwwAuthenticate.php)       |  Defines the authentication method that should be used to gain access to a resource | [WWW-Authenticate](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/WWW-Authenticate) |
-| setDNSPrefetchControl | bool $value = true                                                           | void                                                                                                                 | Activates DNS prefetching on client | [X-DNS-Prefetch-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control) |
-| setFrameOptions | string $option                                                               | void                                                                                                                 | Indicates whether or not a browser should be allowed to render a page in a frame / iframe / embed / object | [X-Frame-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options) |
-| setAccessControlAllowCredentials | void                                                                         | void                                                                                                                 | Answers to **CORS** request by signaling credentials are to be exposed | [Access-Control-Allow-Credentials](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials) |
-| addAccessControlAllowHeader | string $headerName                                                           | void                                                                                                                 | Adds allowed request header to answer a **CORS** request | [Access-Control-Allow-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers) |
-| addAccessControlAllowMethod | string $requestMethod                                                        | void                                                                                                                 | Adds allowed request method to answer a **CORS** request | [Access-Control-Allow-Methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods) |
-| setAccessControlAllowOrigin | string $origin = "*"                                                         | void                                                                                                                 | Sets allowed origin to answer a **CORS** request | [Access-Control-Allow-Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin) |
-| addAccessControlExposeHeader | string $headerName = "*"                                                     | void                                                                                                                 | Adds response header client should expose to answer a **CORS** request | [Access-Control-Expose-Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers) |
-| setAccessControlMaxAge | int $duration                                                                | void                                                                                                                 | Sets how long response to a CORS request should be cached (in seconds) | [Access-Control-Max-Age](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age) |
-| setCustomHeader | string $name, string $value                                                  | void                                                                                                                 | Sets a custom header by name and value (this **may trigger CORS requests**) | (any) |
-| toArray | void                                                                         | array                                                                                                                | Converts all headers set to a name:value array ready to be sent back to client | - |
+- the request `Origin`
+- preflight headers such as `Access-Control-Request-Method` and `Access-Control-Request-Headers`
+- XML policy
 
-Following limitations apply:
+Current behavior:
 
-- multiple ETags are not supported
+- if `allowed_origins` is configured, the request origin must match that policy
+- `allowed_origins="*"` returns `*` when credentials are disabled
+- when credentials are enabled, wildcard policy reflects the request origin instead of returning `*`
+- if no `allowed_origins` are configured, the optional method argument acts as a fallback legacy origin source
+- route-level CORS policy overrides global policy
 
-### Interface Cacheable
+Headers that may be set automatically:
 
-Class [Cacheable](https://github.com/aherne/headers-api/blob/master/src/Cacheable.php) defines blueprints for cache validation via methods:
+- `Access-Control-Allow-Origin`
+- `Access-Control-Allow-Credentials`
+- `Access-Control-Allow-Methods`
+- `Access-Control-Allow-Headers`
+- `Access-Control-Expose-Headers`
+- `Access-Control-Max-Age`
+- `Vary: Origin`
 
-| Method | Arguments | Returns | Description |
-| --- | --- | --- | --- |
-| getEtag | void | string | Gets string representation of resource to be cached |
-| getTime | void | int | Gets unix time representation of resource to be cached |
+## Working Directly With Request
 
-Usage example:
+If you do not need `Wrapper`, you can use `Request` directly:
 
-https://github.com/aherne/lucinda-framework-engine/blob/master/src/AbstractCacheable.php
-https://github.com/aherne/lucinda-framework/blob/master/src/Cacheables/Etag.php
+```php
+$request = new \Lucinda\Headers\Request(getallheaders());
 
+$origin = $request->getOrigin();
+$ifNoneMatch = $request->getIfNoneMatch();
+$range = $request->getRange();
+$authorization = $request->getAuthorization();
+```
 
+The class currently exposes parsed accessors for:
+
+- content negotiation headers such as `Accept`, `Accept-Charset`, `Accept-Encoding`, `Accept-Language`
+- conditional cache headers
+- `Authorization`
+- `Range` and `If-Range`
+- forwarding headers such as `Forwarded`, `X-Forwarded-For`, `X-Forwarded-Host`, `X-Forwarded-Proto`
+- CORS request headers
+- miscellaneous headers such as `Host`, `Referer`, `User-Agent`, `Want-Digest`, `DNT`, `Save-Data`
+- unknown headers through `getCustomHeaders()`
+
+## Working Directly With Response
+
+`Response` validates many standard response headers and exports them through `toArray()`.
+
+Example:
+
+```php
+$response = new \Lucinda\Headers\Response();
+$response->setContentType("application/json", "UTF-8");
+$response->setContentLength(123);
+$response->setRetryAfterDelay(30);
+$response->setFrameOptions("deny");
+
+$cacheControl = $response->setCacheControl();
+$cacheControl->setPublic();
+$cacheControl->setMaxAge(600);
+
+$headers = $response->toArray();
+```
+
+The response API includes helpers for:
+
+- cache headers
+- content headers
+- CORS headers
+- `WWW-Authenticate`
+- `Strict-Transport-Security`
+- `Referrer-Policy`
+- `Tk`
+- `Vary`
+- custom headers via `setCustomHeader()`
+
+Some details worth knowing from the current source:
+
+- `Retry-After` has correctly named methods `setRetryAfterDate()` and `setRetryAfterDelay()`
+- older typoed aliases `setRentryAfterDate()` and `setRentryAfterDelay()` are still present for compatibility
+- zero-like response values such as `Retry-After: 0` and `Access-Control-Max-Age: 0` are preserved by `toArray()`
+
+## Testing
+
+This repository uses [`lucinda/unit-testing`](https://github.com/aherne/unit-testing), not PHPUnit.
+
+Run the suite with:
+
+```bash
+php test.php
+```
+
+The tests in `tests/` are written against the current `src/` API and use validator assertions from `Lucinda\UnitTest\Validator\...`.
+
+## Practical Constraints
+
+A few behaviors are important when integrating the package:
+
+- XML must contain a `<headers>` node or `ConfigurationException` is thrown
+- response setters validate allowed values and may throw `UserException`
+- `Response::setContentRange()` accepts range starts at `0`
+- `Strict-Transport-Security` currently serializes as `max-age=31536000` with optional `includeSubDomains` and `preload`
+- `Response::toArray()` is the intended final handoff point to your actual HTTP emitter
+
+## License
+
+MIT

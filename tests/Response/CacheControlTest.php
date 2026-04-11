@@ -2,8 +2,8 @@
 
 namespace Test\Lucinda\Headers\Response;
 
-use Lucinda\UnitTest\Result;
 use Lucinda\Headers\Response\CacheControl;
+use Lucinda\UnitTest\Validator\Strings;
 
 class CacheControlTest
 {
@@ -11,73 +11,64 @@ class CacheControlTest
     {
         $object = new CacheControl();
         $object->setPublic();
-        return new Result($object->toString()=="public");
+        return (new Strings($object->toString()))->assertEquals("public");
     }
-
 
     public function setPrivate()
     {
         $object = new CacheControl();
         $object->setPrivate();
-        return new Result($object->toString()=="private");
+        return (new Strings($object->toString()))->assertEquals("private");
     }
-
 
     public function setNoCache()
     {
         $object = new CacheControl();
         $object->setNoCache();
-        return new Result($object->toString()=="no-cache");
+        return (new Strings($object->toString()))->assertEquals("no-cache");
     }
-
 
     public function setNoStore()
     {
         $object = new CacheControl();
         $object->setNoStore();
-        return new Result($object->toString()=="no-store");
+        return (new Strings($object->toString()))->assertEquals("no-store");
     }
-
 
     public function setMustRevalidate()
     {
         $object = new CacheControl();
         $object->setMustRevalidate();
-        return new Result($object->toString()=="must-revalidate");
+        return (new Strings($object->toString()))->assertEquals("must-revalidate");
     }
-
 
     public function setMaxAge()
     {
         $object = new CacheControl();
         $object->setMaxAge(10);
-        return new Result($object->toString()=="max-age=10");
+        return (new Strings($object->toString()))->assertEquals("max-age=10");
     }
-
 
     public function setNoTransform()
     {
         $object = new CacheControl();
         $object->setNoTransform();
-        return new Result($object->toString()=="no-transform");
+        return (new Strings($object->toString()))->assertEquals("no-transform");
     }
-
 
     public function setProxyRevalidate()
     {
         $object = new CacheControl();
         $object->setProxyRevalidate();
-        return new Result($object->toString()=="proxy-revalidate");
+        return (new Strings($object->toString()))->assertEquals("proxy-revalidate");
     }
-
 
     public function setProxyMaxAge()
     {
         $object = new CacheControl();
         $object->setProxyMaxAge(10);
-        return new Result($object->toString()=="s-maxage=10");
+        return (new Strings($object->toString()))->assertEquals("s-maxage=10");
     }
-
 
     public function toString()
     {
@@ -85,6 +76,6 @@ class CacheControlTest
         $object->setNoCache();
         $object->setNoStore();
         $object->setMaxAge(10);
-        return new Result($object->toString()=="no-cache, no-store, max-age=10");
+        return (new Strings($object->toString()))->assertEquals("no-cache, no-store, max-age=10");
     }
 }

@@ -3,11 +3,13 @@
 namespace Test\Lucinda\Headers\Request;
 
 use Lucinda\Headers\Request\Range;
-use Lucinda\UnitTest\Result;
+use Lucinda\UnitTest\Validator\Arrays;
+use Lucinda\UnitTest\Validator\Booleans;
+use Lucinda\UnitTest\Validator\Strings;
 
 class RangeTest
 {
-    private $object;
+    private Range $object;
 
     public function __construct()
     {
@@ -16,13 +18,18 @@ class RangeTest
 
     public function getUnit()
     {
-        return new Result($this->object->getUnit()=="bytes");
+        return (new Strings($this->object->getUnit()))->assertEquals("bytes");
     }
 
-
-    public function getConditions()
+    public function getConditions(): array
     {
         $conditions = $this->object->getConditions();
-        return new Result($conditions[0]->getStart()==200 && $conditions[0]->getEnd()==1000 && $conditions[1]->getStart()==19000 && $conditions[1]->getEnd()==null);
+        return [
+            (new Arrays($conditions))->assertSize(2),
+            (new Strings((string) $conditions[0]->getStart()))->assertEquals("200"),
+            (new Strings((string) $conditions[0]->getEnd()))->assertEquals("1000"),
+            (new Strings((string) $conditions[1]->getStart()))->assertEquals("19000"),
+            (new Booleans($conditions[1]->getEnd() === null))->assertTrue()
+        ];
     }
 }

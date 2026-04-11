@@ -3,19 +3,19 @@
 namespace Test\Lucinda\Headers;
 
 use Lucinda\Headers\PolicyLocator;
-use Lucinda\UnitTest\Result;
+use Lucinda\UnitTest\Validator\Arrays;
 
 class PolicyLocatorTest
 {
-    public function getPolicy()
+    public function getPolicy(): array
     {
         $locator = new PolicyLocator(
             \simplexml_load_string(
                 '
 <xml>
-    <headers allowed_request_headers="X-Custom-Header, Upgrade-Insecure-Requests"/>
+    <headers allowed_origins="https://www.google.com" allowed_request_headers="X-Custom-Header, Upgrade-Insecure-Requests"/>
     <routes>
-        <route id="login" allowed_methods="GET,POST"/>
+        <route id="login" allowed_methods="GET,POST" allowed_origins="https://login.example.com"/>
     </routes>
 </xml>
 '
@@ -23,6 +23,12 @@ class PolicyLocatorTest
             "login"
         );
         $policy = $locator->getPolicy();
-        return new Result($policy->getAllowedMethods()==["GET","POST"] && $policy->getAllowedRequestHeaders()==["X-Custom-Header", "Upgrade-Insecure-Requests"]);
+
+        return [
+            (new Arrays($policy->getAllowedMethods()))->assertEquals(["GET", "POST"]),
+            (new Arrays($policy->getAllowedOrigins()))->assertEquals(["https://login.example.com"]),
+            (new Arrays($policy->getAllowedRequestHeaders()))
+                ->assertEquals(["X-Custom-Header", "Upgrade-Insecure-Requests"])
+        ];
     }
 }

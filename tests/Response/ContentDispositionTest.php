@@ -3,7 +3,7 @@
 namespace Test\Lucinda\Headers\Response;
 
 use Lucinda\Headers\Response\ContentDisposition;
-use Lucinda\UnitTest\Result;
+use Lucinda\UnitTest\Validator\Strings;
 
 class ContentDispositionTest
 {
@@ -11,13 +11,12 @@ class ContentDispositionTest
     {
         $object = new ContentDisposition("attachment");
         $object->setFileName("abc.jpg");
-        return new Result($object->toString()=='attachment; filename="abc.jpg"');
+        return (new Strings($object->toString()))->assertEquals('attachment; filename="abc.jpg"');
     }
-
 
     public function toString()
     {
         $object = new ContentDisposition("inline");
-        return new Result($object->toString()=='inline');
+        return (new Strings($object->toString()))->assertEquals("inline");
     }
 }

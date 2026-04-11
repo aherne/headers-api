@@ -28,12 +28,13 @@ class CorsValidator
      *
      * @param Request $request
      * @param Policy  $policy
-     * @param string  $origin
+     * @param string|null $origin
      */
-    public function __construct(Request $request, Policy $policy, string $origin)
+    public function __construct(Request $request, Policy $policy, ?string $origin)
     {
-        if ($request->getOrigin()) {
-            $this->origin = ($origin ? $origin : "*");
+        $requestOrigin = $request->getOrigin();
+        if ($requestOrigin) {
+            $this->origin = $this->detectAllowedOrigin($requestOrigin, $policy, $origin);
             if ($policy->getCredentialsAllowed()) {
                 $this->allowCredentials = true;
             }
@@ -54,6 +55,34 @@ class CorsValidator
         if ($duration = $policy->getCorsMaxAge()) {
             $this->maxAge = $duration;
         }
+    }
+
+    /**
+     * Detects allowed origin based on policy or legacy wrapper argument
+     *
+     * @param string      $requestOrigin
+     * @param Policy      $policy
+     * @param string|null $fallbackOrigin
+     * @return string|null
+     */
+    private function detectAllowedOrigin(string $requestOrigin, Policy $policy, ?string $fallbackOrigin): ?string
+    {
+        $allowedOrigins = $policy->getAllowedOrigins();
+        if (!empty($allowedOrigins)) {
+            if (in_array("*", $allowedOrigins, true)) {
+                return ($policy->getCredentialsAllowed() ? $requestOrigin : "*");
+            }
+            if (in_array($requestOrigin, $allowedOrigins, true)) {
+                return $requestOrigin;
+            }
+            return null;
+        }
+
+        if ($fallbackOrigin!==null) {
+            return ($fallbackOrigin=="*" && $policy->getCredentialsAllowed() ? $requestOrigin : $fallbackOrigin);
+        }
+
+        return ($policy->getCredentialsAllowed() ? $requestOrigin : "*");
     }
 
     /**

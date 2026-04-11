@@ -13,6 +13,10 @@ class Policy
     private ?int $expires = null;
 
     private bool $allowedCredentials = false;
+    /**
+     * @var string[]
+     */
+    private array $allowedOrigins = [];
 
     /**
      * @var string[]
@@ -103,6 +107,7 @@ class Policy
     public function setAllowedMethods(\SimpleXMLElement $xml): void
     {
         if ($xml["allowed_methods"]!==null) {
+            $this->allowedMethods = [];
             $matches = [];
             preg_match_all("/\s*([^,]+)\s*/", (string) $xml["allowed_methods"], $matches);
             if (empty($matches)) {
@@ -128,6 +133,39 @@ class Policy
     }
 
     /**
+     * Sets value to validate CORS request origins based on value of "allowed_origins" XML attribute
+     *
+     * @param \SimpleXMLElement $xml
+     */
+    public function setAllowedOrigins(\SimpleXMLElement $xml): void
+    {
+        if ($xml["allowed_origins"]!==null) {
+            $this->allowedOrigins = [];
+            $matches = [];
+            preg_match_all("/\s*([^,]+)\s*/", (string) $xml["allowed_origins"], $matches);
+            if (empty($matches)) {
+                return;
+            }
+            foreach ($matches[0] as $value) {
+                $value = trim($value);
+                if ($value == "*" || filter_var($value, FILTER_VALIDATE_URL)) {
+                    $this->allowedOrigins[] = $value;
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets values to validate CORS request origins
+     *
+     * @return string[]
+     */
+    public function getAllowedOrigins(): array
+    {
+        return $this->allowedOrigins;
+    }
+
+    /**
      * Sets value to set CORS Access-Control-Allow-Headers based on value of "allowed_request_headers" XML attribute
      *
      * @param \SimpleXMLElement $xml
@@ -135,6 +173,7 @@ class Policy
     public function setAllowedRequestHeaders(\SimpleXMLElement $xml): void
     {
         if ($xml["allowed_request_headers"]!==null) {
+            $this->allowedRequestHeaders = [];
             $matches = [];
             preg_match_all("/\s*([^,]+)\s*/", (string) $xml["allowed_request_headers"], $matches);
             if (empty($matches)) {
@@ -167,6 +206,7 @@ class Policy
     public function setAllowedResponseHeaders(\SimpleXMLElement $xml): void
     {
         if ($xml["allowed_response_headers"]!==null) {
+            $this->allowedResponseHeaders = [];
             $matches = [];
             preg_match_all("/\s*([^,]+)\s*/", (string) $xml["allowed_response_headers"], $matches);
             if (empty($matches)) {

@@ -38,9 +38,9 @@ class StrictTransportSecurity
      */
     public function toString(): string
     {
-        $output = "max-age: ".self::MAX_AGE;
+        $output = "max-age=".self::MAX_AGE;
         if ($this->includeSubdomains) {
-            $output .= "; includeSubdomains";
+            $output .= "; includeSubDomains";
         }
         if ($this->preload) {
             $output .= "; preload";

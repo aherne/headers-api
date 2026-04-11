@@ -88,6 +88,9 @@ class Wrapper
 
         if ($allowedOrigin = $validator->getAllowedOrigin()) {
             $this->response->setAccessControlAllowOrigin($allowedOrigin);
+            if ($allowedOrigin != "*") {
+                $this->response->addVary("Origin");
+            }
         }
 
         if ($maxAge = $validator->getMaxAge()) {

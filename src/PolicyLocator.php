@@ -38,10 +38,12 @@ class PolicyLocator
         $this->policy = new Policy();
         $this->policy->setCachingDisabled($parent);
         $this->policy->setExpirationPeriod($parent);
+        $this->policy->setAllowedOrigins($parent);
         $this->policy->setAllowedRequestHeaders($parent);
         $this->policy->setAllowedResponseHeaders($parent);
         $this->policy->setCorsMaxAge($parent);
         $this->policy->setCredentialsAllowed($parent);
+        $this->policy->setAllowedMethods($parent);
 
         // use route-specific policy, if found
         $info = $xml->xpath("//routes/route[@id='".$requestedPage."']");
@@ -49,8 +51,12 @@ class PolicyLocator
             $child = $info[0];
             $this->policy->setCachingDisabled($child);
             $this->policy->setExpirationPeriod($child);
+            $this->policy->setAllowedOrigins($child);
             $this->policy->setAllowedMethods($child);
-            return;
+            $this->policy->setAllowedRequestHeaders($child);
+            $this->policy->setAllowedResponseHeaders($child);
+            $this->policy->setCorsMaxAge($child);
+            $this->policy->setCredentialsAllowed($child);
         }
     }
 

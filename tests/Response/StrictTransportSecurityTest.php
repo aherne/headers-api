@@ -3,7 +3,8 @@
 namespace Test\Lucinda\Headers\Response;
 
 use Lucinda\Headers\Response\StrictTransportSecurity;
-use Lucinda\UnitTest\Result;
+use Lucinda\UnitTest\Validator\Booleans;
+use Lucinda\UnitTest\Validator\Strings;
 
 class StrictTransportSecurityTest
 {
@@ -17,19 +18,18 @@ class StrictTransportSecurityTest
     public function setIncludeSubdomains()
     {
         $this->object->setIncludeSubdomains();
-        return new Result(true, "tested via toString");
+        return (new Booleans(true))->assertTrue("tested via toString");
     }
-
 
     public function setPreload()
     {
         $this->object->setPreload();
-        return new Result(true, "tested via toString");
+        return (new Booleans(true))->assertTrue("tested via toString");
     }
-
 
     public function toString()
     {
-        return new Result($this->object->toString()=="max-age: 31536000; includeSubdomains; preload");
+        return (new Strings($this->object->toString()))
+            ->assertEquals("max-age=31536000; includeSubDomains; preload");
     }
 }

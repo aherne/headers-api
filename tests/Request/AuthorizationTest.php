@@ -3,11 +3,11 @@
 namespace Test\Lucinda\Headers\Request;
 
 use Lucinda\Headers\Request\Authorization;
-use Lucinda\UnitTest\Result;
+use Lucinda\UnitTest\Validator\Strings;
 
 class AuthorizationTest
 {
-    private $object;
+    private Authorization $object;
 
     public function __construct()
     {
@@ -16,12 +16,11 @@ class AuthorizationTest
 
     public function getType()
     {
-        return new Result($this->object->getType()=="Bearer");
+        return (new Strings($this->object->getType()))->assertEquals("Bearer");
     }
-
 
     public function getCredentials()
     {
-        return new Result($this->object->getCredentials()=="test");
+        return (new Strings($this->object->getCredentials()))->assertEquals("test");
     }
 }

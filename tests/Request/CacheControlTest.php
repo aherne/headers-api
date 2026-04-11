@@ -3,11 +3,12 @@
 namespace Test\Lucinda\Headers\Request;
 
 use Lucinda\Headers\Request\CacheControl;
-use Lucinda\UnitTest\Result;
+use Lucinda\UnitTest\Validator\Booleans;
+use Lucinda\UnitTest\Validator\Integers;
 
 class CacheControlTest
 {
-    private $object;
+    private CacheControl $object;
 
     public function __construct()
     {
@@ -16,30 +17,26 @@ class CacheControlTest
 
     public function isNoCache()
     {
-        return new Result($this->object->isNoCache());
+        return (new Booleans($this->object->isNoCache()))->assertTrue();
     }
-
 
     public function isNoStore()
     {
-        return new Result($this->object->isNoStore());
+        return (new Booleans($this->object->isNoStore()))->assertTrue();
     }
-
 
     public function getMaxAge()
     {
-        return new Result($this->object->getMaxAge()==1);
+        return (new Integers((int) $this->object->getMaxAge()))->assertEquals(1);
     }
-
 
     public function getMaxStaleAge()
     {
-        return new Result($this->object->getMaxStaleAge()==2);
+        return (new Integers((int) $this->object->getMaxStaleAge()))->assertEquals(2);
     }
-
 
     public function getMinFreshAge()
     {
-        return new Result($this->object->getMinFreshAge()==3);
+        return (new Integers((int) $this->object->getMinFreshAge()))->assertEquals(3);
     }
 }

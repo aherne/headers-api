@@ -259,9 +259,9 @@ class Response
      */
     public function setContentRange(string $unit = "bytes", ?int $start = null, ?int $end = null, ?int $size = null): void
     {
-        if ($start && $end) {
-            $this->contentRange = $unit." ".$start."-".$end."/".($size ? $size : "*");
-        } elseif ($size) {
+        if ($start !== null && $end !== null) {
+            $this->contentRange = $unit." ".$start."-".$end."/".($size !== null ? $size : "*");
+        } elseif ($size !== null) {
             $this->contentRange = $unit." */".$size;
         } else {
             throw new UserException("Invalid arguments for header: Content-Range");
@@ -403,23 +403,43 @@ class Response
     }
 
     /**
-     * Sets date value of HTTP header: Rentry-After
+     * Sets date value of HTTP header: Retry-After
      *
      * @param int $unixTime
      */
-    public function setRentryAfterDate(int $unixTime): void
+    public function setRetryAfterDate(int $unixTime): void
     {
         $this->rentryAfter = gmdate("D, d M Y H:i:s T", $unixTime);
     }
 
     /**
-     * Sets delay value of HTTP header: Rentry-After
+     * Sets delay value of HTTP header: Retry-After
+     *
+     * @param int $delay
+     */
+    public function setRetryAfterDelay(int $delay): void
+    {
+        $this->rentryAfter = $delay;
+    }
+
+    /**
+     * Backward-compatible alias for typo kept in earlier releases.
+     *
+     * @param int $unixTime
+     */
+    public function setRentryAfterDate(int $unixTime): void
+    {
+        $this->setRetryAfterDate($unixTime);
+    }
+
+    /**
+     * Backward-compatible alias for typo kept in earlier releases.
      *
      * @param int $delay
      */
     public function setRentryAfterDelay(int $delay): void
     {
-        $this->rentryAfter = $delay;
+        $this->setRetryAfterDelay($delay);
     }
 
     /**
@@ -713,7 +733,7 @@ class Response
             'Last-Modified' => 'lastModified',
             'Location' => 'location',
             'Referrer-Policy' => 'referrerPolicy',
-            'Rentry-After' => 'rentryAfter',
+            'Retry-After' => 'rentryAfter',
             'Source-Map' => 'sourceMap',
             'Strict-Transport-Security' => 'strictTransportSecurity',
             'Timing-Allow-Origin' => 'timingAllowOrigin',
@@ -730,7 +750,7 @@ class Response
         $response = [];
         foreach ($correspondences as $header=>$field) {
             $value = $this->$field;
-            if ($value) {
+            if ($value !== null && $value !== [] && $value !== "") {
                 if (is_object($value)) {
                     $response[$header] = $value->toString();
                 } elseif (is_array($value)) {
