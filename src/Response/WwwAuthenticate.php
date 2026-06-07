@@ -5,7 +5,7 @@ namespace Lucinda\Headers\Response;
 /**
  * Encapsulates HTTP response header: WWW-Authenticate
  */
-class WwwAuthenticate
+final class WwwAuthenticate
 {
     private string $type;
     private ?string $realm = null;

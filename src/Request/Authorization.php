@@ -5,7 +5,7 @@ namespace Lucinda\Headers\Request;
 /**
  * Encapsulates value of HTTP request header: Authorization
  */
-class Authorization
+final class Authorization
 {
     private string $type;
     private string $credentials;

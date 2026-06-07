@@ -8,7 +8,7 @@ use Lucinda\Headers\Request\CacheControl;
  * Performs validation of Cacheable representation of requested resource based on headers encapsulated by
  * Request already.
  */
-class CacheValidator
+final class CacheValidator
 {
     private Request $request;
 

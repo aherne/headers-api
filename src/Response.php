@@ -12,7 +12,7 @@ use Lucinda\Headers\Response\CacheControl;
  * Encapsulates writing HTTP response headers according to specifications EXCEPT those already handled
  * by web server: Connection, Keep-Alive, Date, Server
  */
-class Response
+final class Response
 {
     // IGNORED: Content-Security-Policy, Content-Security-Policy-Report-Only
     /**

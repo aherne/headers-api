@@ -5,7 +5,7 @@ namespace Lucinda\Headers;
 /**
  * Binds Request and Policy to validate CORS request
  */
-class CorsValidator
+final class CorsValidator
 {
     private ?string $origin = null;
     private ?int $maxAge = null;

@@ -5,7 +5,7 @@ namespace Lucinda\Headers\Request;
 /**
  * Encapsulates value of HTTP request header: Cache-Control
  */
-class CacheControl
+final class CacheControl
 {
     private bool $noCache = false;
     private bool $noStore = false;

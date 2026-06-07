@@ -5,7 +5,7 @@ namespace Lucinda\Headers;
 /**
  * Locates HTTP header policies for your application based on 'headers' and 'routes' XML tags
  */
-class PolicyLocator
+final class PolicyLocator
 {
     private Policy $policy;
 

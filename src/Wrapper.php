@@ -6,7 +6,7 @@ namespace Lucinda\Headers;
  * Binds XML to request received from client in order to be able to perform cache or CORS validation later on and
  * set response headers accordingly
  */
-class Wrapper
+final class Wrapper
 {
     private Policy $policy;
     private Request $request;

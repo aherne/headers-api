@@ -11,7 +11,7 @@ use Lucinda\Headers\Request\CacheControl;
  * Encapsulates reading HTTP request headers received from client according to specifications EXCEPT those
  * already handled by web server (Connection, Keep-Alive)
  */
-class Request
+final class Request
 {
     /**
      * @var string[]

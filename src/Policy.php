@@ -7,7 +7,7 @@ use Lucinda\Headers\Request\Method;
 /**
  * Encapsulates HTTP header policies for your application
  */
-class Policy
+final class Policy
 {
     private bool $noCache = false;
     private ?int $expires = null;

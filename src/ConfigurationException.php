@@ -5,6 +5,6 @@ namespace Lucinda\Headers;
 /**
  * Exception thrown when developer misconfigures XML that sets headers policy
  */
-class ConfigurationException extends \Exception
+final class ConfigurationException extends \Exception
 {
 }

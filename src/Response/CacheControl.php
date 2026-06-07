@@ -5,7 +5,7 @@ namespace Lucinda\Headers\Response;
 /**
  * Encapsulates HTTP response header: Cache-Control
  */
-class CacheControl
+final class CacheControl
 {
     private bool $public = false;
     private bool $private = false;

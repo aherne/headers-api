@@ -5,7 +5,7 @@ namespace Lucinda\Headers\Response;
 /**
  * Encapsulates HTTP response header: Strict-Transport-Security
  */
-class StrictTransportSecurity
+final class StrictTransportSecurity
 {
     public const MAX_AGE = 31536000;
     private bool $includeSubdomains = false;

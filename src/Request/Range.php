@@ -7,7 +7,7 @@ use Lucinda\Headers\Request\Range\Condition;
 /**
  * Encapsulates value of HTTP request header: Range
  */
-class Range
+final class Range
 {
     private string $unit;
     /**

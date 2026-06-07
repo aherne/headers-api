@@ -5,7 +5,7 @@ namespace Lucinda\Headers\Request\Range;
 /**
  * Encapsulates conditions set in a Range HTTP request header
  */
-class Condition
+final class Condition
 {
     private ?int $start = null;
     private ?int $end = null;

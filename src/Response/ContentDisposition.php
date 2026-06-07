@@ -5,7 +5,7 @@ namespace Lucinda\Headers\Response;
 /**
  * Encapsulates HTTP response header: Content-Disposition
  */
-class ContentDisposition
+final class ContentDisposition
 {
     private string $type;
     /**
